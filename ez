@@ -6013,7 +6013,7 @@ local function C_165()
 						end
 					end
 
-					if gun.MaxAmmo.Value == 0 then
+					--[[if gun.MaxAmmo.Value == 0 then
 						while gun.MaxAmmo.Value < 10 do
 							print('yes')
 							wait()
@@ -6029,7 +6029,7 @@ local function C_165()
 							task.wait(0.15)
 							vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
 						end
-					end
+					end]]
 
 					if targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
 						if OrbitGLOBAL.Settings.AutoStomp then
