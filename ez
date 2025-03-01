@@ -18,7 +18,7 @@ getgenv().HAVOC = {
 			AutoStomp = false,
 			Void = false,
 			AimPart = "Head",
-			KeyBind = Enum.KeyCode.V
+			KeyBind = Enum.KeyCode.LeftAlt
 		}
 	},
 	LocalPlayer = {
@@ -33,10 +33,10 @@ getgenv().HAVOC = {
 			Speed = 200,
 		},
 		CharacterSettings = {
-			InfStamina = true,
+			InfStamina = false,
 			NoShootingRecoil = false,
-			AntiStomp = true,
-			NoSeats = true,
+			AntiStomp = false,
+			NoSeats = false,
 		},
 	},
 	Player = {
@@ -56,7 +56,7 @@ getgenv().HAVOC = {
 		},
 	},
 	AutoSettings = {
-		AutoReload = true,
+		AutoReload = false,
 		AutoShoot = false,
 		AutoStomp = false,
 	}
@@ -883,6 +883,7 @@ G2L["64"]["Active"] = true;
 G2L["64"]["ScrollingDirection"] = Enum.ScrollingDirection.Y;
 G2L["64"]["BorderSizePixel"] = 0;
 G2L["64"]["CanvasSize"] = UDim2.new(0, 0, 3, 0);
+G2L["64"]["CanvasPosition"] = Vector2.new(0, 140);
 G2L["64"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["64"]["Name"] = [[Player]];
 G2L["64"]["AutomaticCanvasSize"] = Enum.AutomaticSize.Y;
@@ -4758,6 +4759,8 @@ task.spawn(C_31);
 -- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA.Handle
 local function C_47()
 	local script = G2L["47"];
+	local globaltable = getgenv().HAVOC.LocalPlayer.CharacterSettings
+
 	local TweenService = game:GetService("TweenService")
 	local runservice = game:GetService("RunService")
 	local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
@@ -4767,15 +4770,13 @@ local function C_47()
 	local TriggerBTN = script.Parent:WaitForChild("Trigger")
 	local Toggle = script.Parent:WaitForChild("Toggle")
 
-	local infstaminaEnabled = false
-
 	TriggerBTN.MouseButton1Up:Connect(function()
-		if infstaminaEnabled then
-			infstaminaEnabled = false
+		if globaltable.InfStamina then
+			globaltable.InfStamina = false
 			local tween = TweenService:Create(Toggle, tweenInfo, { BackgroundColor3 = Color3.fromRGB(134, 0, 0) })
 			tween:Play()
 		else
-			infstaminaEnabled =  true
+			globaltable.InfStamina = true
 			local tween = TweenService:Create(Toggle, tweenInfo, { BackgroundColor3 = Color3.fromRGB(255, 0, 0) })
 			tween:Play()
 
@@ -4783,7 +4784,7 @@ local function C_47()
 	end)
 
 	runservice.RenderStepped:Connect(function()
-		if infstaminaEnabled then
+		if globaltable.InfStamina then
 			local character = Player.Character or Player.CharacterAdded:Wait()
 			if character then
 				local humanoid = character:WaitForChild("Humanoid")
@@ -5582,7 +5583,7 @@ local function C_106()
 		end
 	end)
 
-	function GetTool()
+	local function GetTool()
 		local Tool = Player:FindFirstChildWhichIsA("Tool")
 		for _, v in pairs(Player.Character:GetChildren()) do 
 			if (v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo')) then 
@@ -5649,7 +5650,7 @@ local function C_107()
 		end
 	end)
 
-	AutoShootToggle.MouseButton1Up:Connect(function()
+	AutoShootTrigger.MouseButton1Up:Connect(function()
 		if AutoGLOBAL.AutoShoot then
 			AutoGLOBAL.AutoShoot = false
 			local tween = TweenService:Create(AutoShootToggle, tweenInfo, { BackgroundColor3 = Color3.fromRGB(134, 0, 0) })
@@ -5662,7 +5663,7 @@ local function C_107()
 		end
 	end)
 
-	function GetTool2()
+	local function GetTool()
 		local Tool = Player:FindFirstChildWhichIsA("Tool")
 		for _, v in pairs(Player.Character:GetChildren()) do 
 			if (v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo')) then 
@@ -5670,18 +5671,17 @@ local function C_107()
 				return Tool
 			end
 		end
-
 	end
 
 	runservice.RenderStepped:Connect(function()
 		if AutoGLOBAL.AutoReload then
-			local Gun = GetTool2()
+			local Gun = GetTool()
 			local KOValue = Player.Character:WaitForChild('BodyEffects')['K.O'].Value
 			if Gun and KOValue ~= true and Gun.Ammo.Value < 1 then
 				game:GetService("ReplicatedStorage"):FindFirstChild("MainEvent"):FireServer("Reload",Gun)
 			end
 		elseif AutoGLOBAL.AutoShoot then
-			local Gun = GetTool2()
+			local Gun = GetTool()
 			if Gun and Gun.Parent == Player.Character then
 				Gun:Activate()
 			end
@@ -5759,7 +5759,6 @@ local function C_14e()
 			local username = player.Name:lower()
 			local displayName = player.DisplayName:lower()
 
-			-- Check if input matches a part of the player's username or display name
 			if username:find(inputName, 1, true) or displayName:find(inputName, 1, true) then
 				return player
 			end
@@ -5777,7 +5776,10 @@ local function C_14e()
 			TargetNameTextBox.Text = foundPlayer.DisplayName
 			HumanoidRootPart.CFrame = foundPlayer.Character.LowerTorso.CFrame
 		else
-			TargetNameTextBox.Text = "No player found"
+			TargetNameTextBox.Text = ""
+			TargetNameTextBox.PlaceholderText = "NO PLAYER FOUND"
+			wait(2)
+			TargetNameTextBox.PlaceholderText = "TARGET NAME OR DISPLAY"
 		end
 	end)
 end;
@@ -5848,6 +5850,9 @@ local function C_165()
 	local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
 	local rootPart = character:WaitForChild("HumanoidRootPart")
 
+	local DataFolder = localPlayer:WaitForChild("DataFolder")
+	local InventoryFolder = DataFolder:WaitForChild("Inventory")
+
 	local targetPlayer
 
 	local ESPS = script.Parent.Parent.Parent.Parent.Parent:WaitForChild("ESPSFolder")
@@ -5863,8 +5868,8 @@ local function C_165()
 			rifleModel = v
 		end
 	end
-	for _,v in ipairs(workspace:GetDescendants()) do
-		if string.find(v.Name,"[Rifle Ammo]") then
+	for _, v in ipairs(workspace:GetDescendants()) do
+		if string.find(v.Name, "Rifle Ammo", 1, true) and v:IsA("Model") then
 			rifleAmmo = v
 		end
 	end
@@ -5893,7 +5898,7 @@ local function C_165()
 		return nil
 	end
 
-	function GetTool()
+	local function GetTool()
 		local Tool
 		for _, v in pairs(localPlayer.Character:GetChildren()) do 
 			if string.find(v.Name,"Rifle") or string.find(v.Name, "LMG") or string.find(v.Name,"Silencer") then
@@ -5912,16 +5917,23 @@ local function C_165()
 				end
 			end 
 		end
-		local rifleForward = rifleModel.Head.CFrame.LookVector
-		local offsetDistance = 3
-		local newCFrame = rifleModel.Head.CFrame + (-rifleForward * offsetDistance)
-
-		rootPart.CFrame = newCFrame
-
+		rootPart.CFrame = rifleModel.Head.CFrame * CFrame.new(0, -3, 0)
 		local screenPoint = camera:WorldToViewportPoint(rifleModel.Head.Position)
 		vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
 		task.wait(0.15)
+		rootPart.Anchored = true
+		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
+	end
+
+	local function getAmmo()
+		localPlayer.Character.Humanoid:UnequipTools()
+		rootPart.CFrame = rifleAmmo.Head.CFrame * CFrame.new(0, -3, 0)
+		local screenPoint = camera:WorldToViewportPoint(rifleAmmo.Head.Position)
+		vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
+		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
+		task.wait(0.15)
+		rootPart.Anchored = true
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
 	end
 
@@ -5974,7 +5986,6 @@ local function C_165()
 
 		rootPart.CFrame = CFrame.new(rootPart.Position.X + randomX, newY, rootPart.Position.Z + randomZ)
 	end
-
 	UserInputService.InputBegan:Connect(function(input,processed)
 		if not processed then
 			if input.KeyCode == OrbitGLOBAL.Settings.KeyBind and OrbitGLOBAL.Enabled then
@@ -5995,6 +6006,7 @@ local function C_165()
 		if OrbitEnabled then
 			local gun = GetTool()
 			if gun then
+				rootPart.Anchored = false
 				getTargetCFrame()
 				if targetPlayer and targetPlayer.Character then
 					if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
@@ -6006,36 +6018,32 @@ local function C_165()
 						ESPS[targetPlayer.Name].BOX.ImageColor3 = Color3.fromRGB(255, 0, 0)
 					end
 
-					if gun.Ammo.Value == 0 and gun.MaxAmmo.Value ~= 0 then
-						while gun.Ammo.Value == 0 do
-							wait()
-							void()
+					if InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 then
+						print('needs ammo')
+						while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
+							print('gettin ammo cuh')
+							getAmmo()
 						end
 					end
 
-					--[[if gun.MaxAmmo.Value == 0 then
-						while gun.MaxAmmo.Value < 10 do
-							print('yes')
-							wait()
-							local rifleForward = rifleAmmo.Head.CFrame.LookVector
-							local offsetDistance = 3
-							local newCFrame = rifleAmmo.Head.CFrame + (-rifleForward * offsetDistance)
-
-							rootPart.CFrame = newCFrame
-
-							local screenPoint = camera:WorldToViewportPoint(rifleAmmo.Head.Position)
-							vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
-							vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
-							task.wait(0.15)
-							vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
+					if OrbitGLOBAL.Settings.Void then
+						if gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 then
+							if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
+								while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
+									print(InventoryFolder[gun.Name].Value)
+									print('Ammo voiding')
+									wait()
+									void()
+								end
+							end
 						end
-					end]]
+					end
 
-					if targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
+					if targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true then
 						if OrbitGLOBAL.Settings.AutoStomp then
 							if targetPlayer.Character:WaitForChild("BodyEffects")['Dead'].Value then
 								if OrbitGLOBAL.Settings.Void then
-									while targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true do
+									while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
 										wait()
 										void()
 									end
@@ -6048,7 +6056,7 @@ local function C_165()
 							end
 						else
 							if OrbitGLOBAL.Settings.Void then
-								while targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true do
+								while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
 									wait()
 									void()
 								end
@@ -6133,8 +6141,6 @@ local function C_167()
 		for _, player in pairs(game.Players:GetPlayers()) do
 			local username = player.Name:lower()
 			local displayName = player.DisplayName:lower()
-
-			-- Check if input matches a part of the player's username or display name
 			if username:find(inputName, 1, true) or displayName:find(inputName, 1, true) then
 				return player.DisplayName
 			end
@@ -6144,6 +6150,10 @@ local function C_167()
 
 	TargetNameTextBox.FocusLost:Connect(function(enterPressed)
 		if enterPressed then
+			if TargetNameTextBox.Text == "" then
+				OrbitGLOBAL.Target = ""
+				return
+			end
 			local partialInput = TargetNameTextBox.Text
 			local foundPlayer = findClosestMatchingPlayer(partialInput)
 
@@ -6152,7 +6162,10 @@ local function C_167()
 				TargetNameTextBox.Text = foundPlayer
 			else
 				OrbitGLOBAL.Target = nil
-				TargetNameTextBox.Text = "No player found"
+				TargetNameTextBox.Text = ""
+				TargetNameTextBox.PlaceholderText = "NO PLAYER FOUND"
+				wait(2)
+				TargetNameTextBox.PlaceholderText = "TARGET NAME OR DISPLAY"
 			end
 		end
 	end)
