@@ -18,7 +18,7 @@ getgenv().HAVOC = {
 			AutoStomp = false,
 			Void = false,
 			AimPart = "Head",
-			KeyBind = Enum.KeyCode.LeftAlt
+			KeyBind = Enum.KeyCode.V
 		}
 	},
 	LocalPlayer = {
@@ -883,7 +883,6 @@ G2L["64"]["Active"] = true;
 G2L["64"]["ScrollingDirection"] = Enum.ScrollingDirection.Y;
 G2L["64"]["BorderSizePixel"] = 0;
 G2L["64"]["CanvasSize"] = UDim2.new(0, 0, 3, 0);
-G2L["64"]["CanvasPosition"] = Vector2.new(0, 140);
 G2L["64"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["64"]["Name"] = [[Player]];
 G2L["64"]["AutomaticCanvasSize"] = Enum.AutomaticSize.Y;
@@ -4383,7 +4382,9 @@ G2L["202"]["AspectRatio"] = 3.4155;
 
 -- StarterGui.havoc.Lighting
 G2L["203"] = Instance.new("LocalScript", G2L["1"]);
+G2L["203"]["Enabled"] = false;
 G2L["203"]["Name"] = [[Lighting]];
+G2L["203"]["Disabled"] = true;
 
 
 -- StarterGui.havoc.LoadGlobalTable
@@ -5922,8 +5923,8 @@ local function C_165()
 		vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
 		task.wait(0.15)
-		rootPart.Anchored = true
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
+		rootPart.Anchored = true
 	end
 
 	local function getAmmo()
@@ -5933,8 +5934,8 @@ local function C_165()
 		vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
 		task.wait(0.15)
-		rootPart.Anchored = true
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
+		rootPart.Anchored = true
 	end
 
 	local function orbitAround()
@@ -6019,7 +6020,6 @@ local function C_165()
 					end
 
 					if InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 then
-						print('needs ammo')
 						while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
 							print('gettin ammo cuh')
 							getAmmo()
@@ -6030,7 +6030,6 @@ local function C_165()
 						if gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 then
 							if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
 								while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
-									print(InventoryFolder[gun.Name].Value)
 									print('Ammo voiding')
 									wait()
 									void()
@@ -6566,14 +6565,6 @@ local function C_1f2()
 	end
 end;
 task.spawn(C_1f2);
--- StarterGui.havoc.Lighting
-local function C_203()
-	local script = G2L["203"];
-	--[[local Lighting = game:GetService("Lighting")
-	
-	Lighting.FogColor = Color3.fromRGB(182, 58, 46)--]]
-end;
-task.spawn(C_203);
 -- StarterGui.havoc.LoadGlobalTable
 local function C_204()
 	local script = G2L["204"];
