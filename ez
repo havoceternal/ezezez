@@ -6065,76 +6065,79 @@ local function C_16b()
 			end
 		end
 	end)
+	
+RunService.RenderStepped:Connect(function()
+	if not OrbitGLOBAL.Enabled and OrbitEnabled then
+		OrbitEnabled = false
+	end
 
-	RunService.RenderStepped:Connect(function()
-		if not OrbitGLOBAL.Enabled and OrbitEnabled then
-			OrbitEnabled = false
-		end
+	if OrbitEnabled then
+		local gun = GetTool()
+		if gun then
+			rootPart.Anchored = false
+			getTargetCFrame()
+			if targetPlayer and targetPlayer.Character then
+				if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
+					orbitAround()
+					lockCamera()
+					shootGun()
+				end
+				if ESPS:FindFirstChild(targetPlayer.Name) then
+					ESPS[targetPlayer.Name].BOX.ImageColor3 = Color3.fromRGB(255, 0, 0)
+				end
 
-		if OrbitEnabled then
-			local gun = GetTool()
-			if gun then
-				rootPart.Anchored = false
-				getTargetCFrame()
-				if targetPlayer and targetPlayer.Character then
-					if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
-						orbitAround()
-						lockCamera()
-						shootGun()
+				if InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 then
+					while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
+						localPlayer.Character.Humanoid:UnequipTools()
+						gettingAmmo = true
+						getAmmo()
 					end
-					if ESPS:FindFirstChild(targetPlayer.Name) then
-						ESPS[targetPlayer.Name].BOX.ImageColor3 = Color3.fromRGB(255, 0, 0)
-					end
+				else
+					gettingAmmo = false
+				end
 
-					if InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 then
-						while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
-							localPlayer.Character.Humanoid:UnequipTools()
-							gettingAmmo = true
-							getAmmo()
+				if OrbitGLOBAL.Settings.Void then
+					if gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 then
+						if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
+							while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
+								gettingAmmo = true
+								wait()
+								void()
+							end
 						end
 					else
 						gettingAmmo = false
 					end
+				end
 
-					if OrbitGLOBAL.Settings.Void then
-						if gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 then
-							if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
-								while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
-									wait()
-									void()
-								end
-							end
-						end
-					end
-
-					if targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and gettingAmmo == false then
-						if OrbitGLOBAL.Settings.AutoStomp then
-							if targetPlayer.Character:WaitForChild("BodyEffects")['Dead'].Value then
-								if OrbitGLOBAL.Settings.Void then
-									while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
-										wait()
-										void()
-									end
-								end
-							else
-								local upperTorsoPosition = targetPlayer.Character.UpperTorso.Position
-								local targetPosition = upperTorsoPosition + Vector3.new(0, 2, 0)
-								rootPart.CFrame = CFrame.new(targetPosition, targetPosition + Vector3.new(0, 0, -1))
-								game:GetService("ReplicatedStorage").MainEvent:FireServer("Stomp")
-							end
-						else
+				if targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and gettingAmmo == false then
+					if OrbitGLOBAL.Settings.AutoStomp then
+						if targetPlayer.Character:WaitForChild("BodyEffects")['Dead'].Value then
 							if OrbitGLOBAL.Settings.Void then
 								while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
 									wait()
 									void()
 								end
 							end
+						else
+							local upperTorsoPosition = targetPlayer.Character.UpperTorso.Position
+							local targetPosition = upperTorsoPosition + Vector3.new(0, 2, 0)
+							rootPart.CFrame = CFrame.new(targetPosition, targetPosition + Vector3.new(0, 0, -1))
+							game:GetService("ReplicatedStorage").MainEvent:FireServer("Stomp")
+						end
+					else
+						if OrbitGLOBAL.Settings.Void then
+							while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
+								wait()
+								void()
+							end
 						end
 					end
 				end
 			end
 		end
-	end)
+	end
+end)
 
 end;
 task.spawn(C_16b);
