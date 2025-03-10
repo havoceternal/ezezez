@@ -882,11 +882,11 @@ G2L["63"]["PaddingTop"] = UDim.new(0.03, 0);
 
 -- StarterGui.havoc.MainFrame.ViewFrame.Player
 G2L["64"] = Instance.new("ScrollingFrame", G2L["d"]);
+G2L["64"]["Visible"] = false;
 G2L["64"]["Active"] = true;
 G2L["64"]["ScrollingDirection"] = Enum.ScrollingDirection.Y;
 G2L["64"]["BorderSizePixel"] = 0;
 G2L["64"]["CanvasSize"] = UDim2.new(0, 0, 3, 0);
-G2L["64"]["CanvasPosition"] = Vector2.new(0, 140);
 G2L["64"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["64"]["Name"] = [[Player]];
 G2L["64"]["AutomaticCanvasSize"] = Enum.AutomaticSize.Y;
@@ -2026,7 +2026,6 @@ G2L["ec"]["PaddingTop"] = UDim.new(0.03, 0);
 
 -- StarterGui.havoc.MainFrame.ViewFrame.AutoSettings
 G2L["ed"] = Instance.new("ScrollingFrame", G2L["d"]);
-G2L["ed"]["Visible"] = false;
 G2L["ed"]["Active"] = true;
 G2L["ed"]["ScrollingDirection"] = Enum.ScrollingDirection.Y;
 G2L["ed"]["BorderSizePixel"] = 0;
@@ -3401,7 +3400,6 @@ G2L["193"]["Active"] = true;
 G2L["193"]["ScrollingDirection"] = Enum.ScrollingDirection.Y;
 G2L["193"]["BorderSizePixel"] = 0;
 G2L["193"]["CanvasSize"] = UDim2.new(0, 0, 2.5, 0);
-G2L["193"]["CanvasPosition"] = Vector2.new(0, 140);
 G2L["193"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["193"]["Name"] = [[AimLock]];
 G2L["193"]["AutomaticCanvasSize"] = Enum.AutomaticSize.Y;
@@ -5683,26 +5681,32 @@ local function C_c8()
 		end
 	end
 
-	Character.ChildAdded:Connect(function(child)
-		local gun = GetTool()
-		if gun then
-			gun:FindFirstChildOfClass("LocalScript").Disabled = true
-			gun.Activated:Connect(function()
-				local target = getClosestPlayer()
-				if target then
-					local args = {
-						[1] = "ShootGun",
-						[2] = gun:WaitForChild("Handle"),
-						[3] = HumanoidRootPart.Position,
-						[4] = target.Character.Head.Position,
-						[5] = target.Character.Head,
-						[6] = Vector3.xAxis
-					}
-					game:GetService("ReplicatedStorage"):WaitForChild("MainEvent"):FireServer(unpack(args))
-				end
-			end)
-		end
-	end)
+	local function childadded()
+		Character.ChildAdded:Connect(function(child)
+			local gun = GetTool()
+			if gun then
+				gun:FindFirstChildOfClass("LocalScript").Disabled = true
+				gun.Activated:Connect(function()
+					if RageAimGLOBAL.WallBang then
+						local target = getClosestPlayer()
+						if target then
+							local args = {
+								[1] = "ShootGun",
+								[2] = gun:WaitForChild("Handle"),
+								[3] = HumanoidRootPart.Position,
+								[4] = target.Character.Head.Position,
+								[5] = target.Character.Head,
+								[6] = Vector3.new(0,0,0)
+							}
+							game:GetService("ReplicatedStorage"):WaitForChild("MainEvent"):FireServer(unpack(args))
+						end
+					end
+				end)
+			end
+		end)
+	end
+
+	Character.Humanoid.Died:Connect(childadded)
 
 	RunService.RenderStepped:Connect(function()
 		if not RageAimGLOBAL.WallBang then
@@ -6105,6 +6109,7 @@ local function C_174()
 
 	local OrbitEnabled = false
 	local gettingAmmo = false
+	local reloadingAmmo = false
 	local minY = 100000
 	local moveDistance = 500
 
@@ -6170,7 +6175,6 @@ local function C_174()
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
 		task.wait(0.1)
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
-		--rootPart.Anchored = true
 	end
 
 	local function getAmmo()
@@ -6180,7 +6184,6 @@ local function C_174()
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
 		task.wait(0.1)
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
-		--rootPart.Anchored = true
 	end
 
 	local function orbitAround()
@@ -6215,7 +6218,7 @@ local function C_174()
 						[3] = rootPart.Position,
 						[4] = targetHead.Position,
 						[5] = targetHead,
-						[6] = Vector3.xAxis
+						[6] = Vector3.new(0,0,0)
 					}
 					game:GetService("ReplicatedStorage"):WaitForChild("MainEvent"):FireServer(unpack(args))
 				end
@@ -6252,7 +6255,6 @@ local function C_174()
 		if OrbitEnabled then
 			local gun = GetTool()
 			if gun then
-				rootPart.Anchored = false
 				getTargetCFrame()
 				if targetPlayer and targetPlayer.Character then
 					if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
@@ -6263,6 +6265,7 @@ local function C_174()
 					if ESPS:FindFirstChild(targetPlayer.Name) then
 						ESPS[targetPlayer.Name].BOX.ImageColor3 = Color3.fromRGB(255, 0, 0)
 					end
+
 
 					if InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 then
 						while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
@@ -6278,21 +6281,23 @@ local function C_174()
 						if gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 then
 							if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
 								while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
-									gettingAmmo = true
+									reloadingAmmo = true
 									wait()
 									void()
 								end
 							end
 						else
-							gettingAmmo = false
+							if gettingAmmo == false then
+								reloadingAmmo = false
+							end
 						end
 					end
 
-					if targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and gettingAmmo == false then
+					if targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and gettingAmmo == false and reloadingAmmo == false then
 						if OrbitGLOBAL.Settings.AutoStomp then
 							if targetPlayer.Character:WaitForChild("BodyEffects")['Dead'].Value then
 								if OrbitGLOBAL.Settings.Void then
-									while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
+									while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not gettingAmmo and not reloadingAmmo do
 										wait()
 										void()
 									end
@@ -6305,7 +6310,7 @@ local function C_174()
 							end
 						else
 							if OrbitGLOBAL.Settings.Void then
-								while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
+								while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not gettingAmmo and not reloadingAmmo do
 									wait()
 									void()
 								end
@@ -6615,12 +6620,14 @@ local function C_1ea()
 
 	function updateESPColors()
 		for _, guiElement in ipairs(ESPSFolder:GetChildren()) do
-			if aimTarget and guiElement.Name == aimTarget.Name then
-				guiElement.BOX.ImageColor3 = Color3.fromRGB(255, 0, 0)
-				guiElement.PLAYERNAME.TextColor3 = Color3.fromRGB(255, 0, 0)
-			else
-				guiElement.BOX.ImageColor3 = Color3.fromRGB(255, 255, 255)
-				guiElement.PLAYERNAME.TextColor3 = Color3.fromRGB(255, 255, 255)
+			if guiElement:IsA("BillboardGui") then
+				if aimTarget and guiElement.Name == aimTarget.Name then
+					guiElement.BOX.ImageColor3 = Color3.fromRGB(255, 0, 0)
+					guiElement.PLAYERNAME.TextColor3 = Color3.fromRGB(255, 0, 0)
+				else
+					guiElement.BOX.ImageColor3 = Color3.fromRGB(255, 255, 255)
+					guiElement.PLAYERNAME.TextColor3 = Color3.fromRGB(255, 255, 255)
+				end
 			end
 		end
 	end
