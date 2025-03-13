@@ -5706,7 +5706,9 @@ local function C_c8()
 		end)
 	end
 
-	Character.Humanoid.Died:Connect(childadded)
+	childadded()
+
+	Player.CharacterAdded:Connect(childadded)
 
 	RunService.RenderStepped:Connect(function()
 		if not RageAimGLOBAL.WallBang then
