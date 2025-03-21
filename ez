@@ -5466,14 +5466,14 @@ local function C_b3()
 		local hasWhitelist = RageAimGLOBAL.Whitelist and #RageAimGLOBAL.Whitelist > 0
 
 		if hasBlacklist and hasWhitelist then
-			return true -- Ignore both lists and kill everyone
+			return true
 		elseif hasBlacklist then
-			return isPlayerBlacklisted(targetPlayer) -- Kill only blacklisted players
+			return isPlayerBlacklisted(targetPlayer)
 		elseif hasWhitelist then
-			return not isPlayerWhitelisted(targetPlayer) -- Kill everyone except whitelisted
+			return not isPlayerWhitelisted(targetPlayer)
 		end
 
-		return true -- If no lists are set, kill everyone
+		return true
 	end
 
 	local function GetClosestPlayer()
@@ -5553,28 +5553,26 @@ local function C_be()
 	end
 
 	WhitelistTextBox.FocusLost:Connect(function(enterPressed)
-		if enterPressed then
-			local inputText = WhitelistTextBox.Text
-			local whitelistTable = {}
+		local inputText = WhitelistTextBox.Text
+		local whitelistTable = {}
 
-			if inputText == "" or inputText:match("^%s*$") then
-				RageAimGLOBAL.Whitelist = {}
-				return
-			end
-
-			for substring in string.gmatch(inputText, "[^,]+") do
-				local trimmed = substring:match("^%s*(.-)%s*$")
-				local foundPlayer = findClosestMatchingPlayer(trimmed)
-
-				if foundPlayer then
-					table.insert(whitelistTable, foundPlayer)
-				end
-			end
-
-			RageAimGLOBAL.Whitelist = whitelistTable
-
-			WhitelistTextBox.Text = table.concat(whitelistTable, ", ")
+		if inputText == "" or inputText:match("^%s*$") then
+			RageAimGLOBAL.Whitelist = {}
+			return
 		end
+
+		for substring in string.gmatch(inputText, "[^,]+") do
+			local trimmed = substring:match("^%s*(.-)%s*$")
+			local foundPlayer = findClosestMatchingPlayer(trimmed)
+
+			if foundPlayer then
+				table.insert(whitelistTable, foundPlayer)
+			end
+		end
+
+		RageAimGLOBAL.Whitelist = whitelistTable
+
+		WhitelistTextBox.Text = table.concat(whitelistTable, ", ")
 	end)
 
 end;
@@ -5600,27 +5598,25 @@ local function C_bf()
 	end
 
 	BlacklistTextBox.FocusLost:Connect(function(enterPressed)
-		if enterPressed then
-			local inputText = BlacklistTextBox.Text
-			local blacklistTable = {}
+		local inputText = BlacklistTextBox.Text
+		local blacklistTable = {}
 
-			if inputText == "" or inputText:match("^%s*$") then
-				RageAimGLOBAL.Blacklist = {}
-				return
-			end
-
-			for substring in string.gmatch(inputText, "[^,]+") do
-				local trimmed = substring:match("^%s*(.-)%s*$")
-				local foundPlayer = findClosestMatchingPlayer(trimmed)
-
-				if foundPlayer then
-					table.insert(blacklistTable, foundPlayer)
-				end
-			end
-
-			RageAimGLOBAL.Blacklist = blacklistTable
-			BlacklistTextBox.Text = table.concat(blacklistTable, ", ")
+		if inputText == "" or inputText:match("^%s*$") then
+			RageAimGLOBAL.Blacklist = {}
+			return
 		end
+
+		for substring in string.gmatch(inputText, "[^,]+") do
+			local trimmed = substring:match("^%s*(.-)%s*$")
+			local foundPlayer = findClosestMatchingPlayer(trimmed)
+
+			if foundPlayer then
+				table.insert(blacklistTable, foundPlayer)
+			end
+		end
+
+		RageAimGLOBAL.Blacklist = blacklistTable
+		BlacklistTextBox.Text = table.concat(blacklistTable, ", ")
 	end)
 end;
 task.spawn(C_bf);
@@ -6276,11 +6272,12 @@ local function C_174()
 
 					if InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 then
 						isBusy = true
-						while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
+						while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
 							localPlayer.Character.Humanoid:UnequipTools()
 							gettingAmmo = true
 							getAmmo()
 						end
+						GetTool()
 						camera.CameraSubject = character
 						gettingAmmo = false
 						isBusy = false
@@ -6290,7 +6287,7 @@ local function C_174()
 						if gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 then
 							if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
 								isBusy = true
-								while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
+								while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
 									reloadingAmmo = true
 									wait()
 									void()
@@ -6300,14 +6297,12 @@ local function C_174()
 							end
 						end
 					end
-
-					-- Auto-Stomp System with Safety Checks
-					if targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not gettingAmmo and not reloadingAmmo and not isBusy then
+					if targetPlayer and targetPlayer.Character and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not gettingAmmo and not reloadingAmmo and not isBusy then
 						if OrbitGLOBAL.Settings.AutoStomp then
 							if targetPlayer.Character:WaitForChild("BodyEffects")['Dead'].Value then
 								if OrbitGLOBAL.Settings.Void then
 									isBusy = true
-									while targetPlayer and OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not gettingAmmo and not reloadingAmmo do
+									while targetPlayer and targetPlayer.Character and OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not gettingAmmo and not reloadingAmmo do
 										wait()
 										void()
 									end
@@ -6315,7 +6310,7 @@ local function C_174()
 								end
 							else
 								local upperTorsoPosition = targetPlayer.Character.UpperTorso.Position
-								local targetPosition = upperTorsoPosition + Vector3.new(0, 2, 0)
+								local targetPosition = upperTorsoPosition + Vector3.new(0, 3, 0)
 								rootPart.CFrame = CFrame.new(targetPosition, targetPosition + Vector3.new(0, 0, -1))
 								ReplicatedStorage.MainEvent:FireServer("Stomp")
 							end
