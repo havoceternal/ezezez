@@ -5685,7 +5685,9 @@ local function C_c8()
 		Character.ChildAdded:Connect(function(child)
 			local gun = GetTool()
 			if gun then
-				gun:FindFirstChildOfClass("LocalScript").Disabled = true
+				if RageAimGLOBAL.WallBang then 
+					gun:FindFirstChildOfClass("LocalScript").Disabled = true
+				end
 				gun.Activated:Connect(function()
 					if RageAimGLOBAL.WallBang then
 						local target = getClosestPlayer()
@@ -5844,7 +5846,6 @@ local function C_10e()
 	local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
 
 	local Player = game.Players.LocalPlayer
-	local Backpack = Player:WaitForChild("Backpack")
 
 	local AutoReloadTrigger = script.Parent:WaitForChild("AUTORELOAD"):WaitForChild("Trigger")
 	local AutoReloadToggle = AutoReloadTrigger.Parent:WaitForChild("Toggle")
@@ -5906,8 +5907,8 @@ local function C_10e()
 		end
 	end)
 
-	local function GetTool()
-		local Tool = Player:FindFirstChildWhichIsA("Tool")
+	local function GetTool3()
+		local Tool
 		for _, v in pairs(Player.Character:GetChildren()) do 
 			if (v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo')) then 
 				Tool = v 
@@ -5918,26 +5919,28 @@ local function C_10e()
 
 	runservice.RenderStepped:Connect(function()
 		if AutoGLOBAL.AutoReload then
-			local Gun = GetTool()
+			local Gun = GetTool3()
 			local KOValue = Player.Character:WaitForChild('BodyEffects')['K.O'].Value
 			if Gun and KOValue ~= true and Gun.Ammo.Value < 1 then
 				game:GetService("ReplicatedStorage"):FindFirstChild("MainEvent"):FireServer("Reload",Gun)
 			end
-		elseif AutoGLOBAL.AutoShoot then
-			local Gun = GetTool()
-			if Gun and Gun.Parent == Player.Character then
+		end
+		if AutoGLOBAL.AutoShoot then
+			local Gun = GetTool3()
+			local KOValue = Player.Character:WaitForChild('BodyEffects')['K.O'].Value
+			if Gun and KOValue ~= true then
 				Gun:Activate()
 			end
-		elseif AutoGLOBAL.AutoStomp then
+		end
+		if AutoGLOBAL.AutoStomp then
 			game:GetService("ReplicatedStorage"):FindFirstChild("MainEvent"):FireServer("Stomp")
-		elseif AutoGLOBAL.AutoMask then
-			local Mask = Backpack:FindFirstChild("[Mask]")
-			if Mask then
-				local Humanoid = Player.Character.Humanoid
-				if Humanoid and Humanoid.DisplayDistanceType ~= Enum.HumanoidDisplayDistanceType.None then
-					Humanoid:EquipTool(Mask)
-					Mask:Activate()
-				end
+		end
+		if AutoGLOBAL.AutoMask then
+			local Mask = Player.Backpack:FindFirstChild("[Mask]")
+			local Humanoid = Player.Character.Humanoid
+			if Mask and Humanoid and Humanoid.DisplayDistanceType ~= Enum.HumanoidDisplayDistanceType.None then
+				Humanoid:EquipTool(Mask)
+				Mask:Activate()
 			end
 		end
 	end)
@@ -5979,11 +5982,8 @@ local function C_144()
 					elseif TriggerBTN.Parent.Name == "WAREHOUSE" then
 						HumanoidRootPart.CFrame = CFrame.new(481.9,48,2,-607.5,0,0,0)
 					elseif TriggerBTN.Parent.Name == "RIFLE" then
-						for _,v in ipairs(workspace:GetDescendants()) do
-							if v.Name == "[Rifle] - $1694" then
-								HumanoidRootPart.CFrame = v.Head.CFrame
-							end
-						end
+						local rifleModel = workspace:FindFirstChild("[Rifle] - $1694", true)
+						HumanoidRootPart.CFrame = rifleModel.Head.CFrame
 					end
 				end
 			end)
@@ -6095,6 +6095,7 @@ local function C_174()
 
 	local Players = game:GetService("Players")
 	local UserInputService = game:GetService("UserInputService")
+	local ReplicatedStorage = game:GetService("ReplicatedStorage")
 	local RunService = game:GetService("RunService")
 	local camera = workspace.CurrentCamera
 
@@ -6112,19 +6113,16 @@ local function C_174()
 	local OrbitEnabled = false
 	local gettingAmmo = false
 	local reloadingAmmo = false
-	local minY = 100000
-	local moveDistance = 500
+	local isBusy = false
+	local minY = 1000000
+	local moveDistance = 1000
 
-	local rifleModel
+	local rifleModel = workspace:FindFirstChild("[Rifle] - $1694", true)
 	local rifleAmmo
-	for _,v in ipairs(workspace:GetDescendants()) do
-		if v.Name == "[Rifle] - $1694" then
-			rifleModel = v
-		end
-	end
 	for _, v in ipairs(workspace:GetDescendants()) do
 		if string.find(v.Name, "Rifle Ammo", 1, true) and v:IsA("Model") then
 			rifleAmmo = v
+			break
 		end
 	end
 
@@ -6155,15 +6153,18 @@ local function C_174()
 	local function GetTool()
 		local Tool
 		for _, v in pairs(localPlayer.Character:GetChildren()) do 
-			if string.find(v.Name,"Rifle") or string.find(v.Name, "LMG") or string.find(v.Name,"Silencer") then
+			if string.find(v.Name,"Rifle") or string.find(v.Name, "LMG") or string.find(v.Name,"Silencer") or string.find(v.Name,"AUG") then
 				if v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo') then 
-					Tool = v 
+					Tool = v
+					if not isBusy then
+						camera.CameraSubject = character
+					end
 					return Tool
 				end
 			end
 		end
 		for _,v in pairs(localPlayer.Backpack:GetChildren()) do
-			if string.find(v.Name,"Rifle") or string.find(v.Name, "LMG") or string.find(v.Name,"Silencer") then
+			if string.find(v.Name,"Rifle") or string.find(v.Name, "LMG") or string.find(v.Name,"Silencer") or string.find(v.Name,"AUG") then
 				if v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo') then 
 					Tool = v 
 					localPlayer.Character.Humanoid:EquipTool(v)
@@ -6172,6 +6173,8 @@ local function C_174()
 			end 
 		end
 		rootPart.CFrame = rifleModel.Head.CFrame * CFrame.new(0, -3, 0)
+		camera.CameraSubject = rifleModel.Head
+		camera.CFrame = CFrame.new(camera.CFrame.Position, rifleModel.Head.Position)
 		local screenPoint = camera:WorldToViewportPoint(rifleModel.Head.Position)
 		vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
@@ -6181,6 +6184,8 @@ local function C_174()
 
 	local function getAmmo()
 		rootPart.CFrame = rifleAmmo.Head.CFrame * CFrame.new(0, -3, 0)
+		camera.CameraSubject = rifleAmmo.Head
+		camera.CFrame = CFrame.new(camera.CFrame.Position, rifleAmmo.Head.Position)
 		local screenPoint = camera:WorldToViewportPoint(rifleAmmo.Head.Position)
 		vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
 		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
@@ -6254,68 +6259,65 @@ local function C_174()
 			OrbitEnabled = false
 		end
 
-		if OrbitEnabled then
+		if OrbitEnabled and not isBusy and targetPlayer then
 			local gun = GetTool()
 			if gun then
 				getTargetCFrame()
 				if targetPlayer and targetPlayer.Character then
-					if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
+					if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and isBusy == false then
 						orbitAround()
 						lockCamera()
 						shootGun()
 					end
-					if ESPS:FindFirstChild(targetPlayer.Name) then
-						ESPS[targetPlayer.Name].BOX.ImageColor3 = Color3.fromRGB(255, 0, 0)
-					end
 
+					--[[if ESPS:FindFirstChild(targetPlayer.Name) then
+						ESPS[targetPlayer.Name].BOX.ImageColor3 = Color3.fromRGB(255, 0, 0)
+					end--]]
 
 					if InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 then
+						isBusy = true
 						while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
 							localPlayer.Character.Humanoid:UnequipTools()
 							gettingAmmo = true
 							getAmmo()
 						end
-					else
+						camera.CameraSubject = character
 						gettingAmmo = false
+						isBusy = false
 					end
 
-					if OrbitGLOBAL.Settings.Void then
+					if OrbitGLOBAL.Settings.Void and not isBusy then
 						if gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 then
 							if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
+								isBusy = true
 								while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
 									reloadingAmmo = true
 									wait()
 									void()
 								end
-							end
-						else
-							if gettingAmmo == false then
 								reloadingAmmo = false
+								isBusy = false
 							end
 						end
 					end
 
-					if targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and gettingAmmo == false and reloadingAmmo == false then
+					-- Auto-Stomp System with Safety Checks
+					if targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not gettingAmmo and not reloadingAmmo and not isBusy then
 						if OrbitGLOBAL.Settings.AutoStomp then
 							if targetPlayer.Character:WaitForChild("BodyEffects")['Dead'].Value then
 								if OrbitGLOBAL.Settings.Void then
-									while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not gettingAmmo and not reloadingAmmo do
+									isBusy = true
+									while targetPlayer and OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not gettingAmmo and not reloadingAmmo do
 										wait()
 										void()
 									end
+									isBusy = false
 								end
 							else
 								local upperTorsoPosition = targetPlayer.Character.UpperTorso.Position
 								local targetPosition = upperTorsoPosition + Vector3.new(0, 2, 0)
 								rootPart.CFrame = CFrame.new(targetPosition, targetPosition + Vector3.new(0, 0, -1))
-								game:GetService("ReplicatedStorage").MainEvent:FireServer("Stomp")
-							end
-						else
-							if OrbitGLOBAL.Settings.Void then
-								while OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value == true and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not gettingAmmo and not reloadingAmmo do
-									wait()
-									void()
-								end
+								ReplicatedStorage.MainEvent:FireServer("Stomp")
 							end
 						end
 					end
@@ -6638,7 +6640,7 @@ local function C_1ea()
 		if AimLockGLOBAL.Enabled then
 			aimTarget = nil
 		end
-		updateESPColors()
+		--updateESPColors()
 	end
 
 	local lastCheckedTarget = nil
@@ -6685,7 +6687,7 @@ local function C_1ea()
 				end
 			end
 		end
-		updateESPColors()
+		--updateESPColors()
 	end
 
 	UserInputService.InputBegan:Connect(function(input)
@@ -6706,12 +6708,13 @@ local function C_1ea()
 		if input.KeyCode == AimLockGLOBAL.Settings.KeyBind and not toggleMode then
 			isHoldingKeybind = false
 			aimTarget = nil
-			updateESPColors()
+			--updateESPColors()
 		end
 	end)
 
 	RunService.Heartbeat:Connect(function()
-		if AimLockGLOBAL.Enabled then
+		local BodyEffects = player.Character:FindFirstChild("BodyEffects")
+		if AimLockGLOBAL.Enabled and player.Character.Humanoid.Health > 0 and BodyEffects and not BodyEffects["K.O"].Value then
 			aimlockUpdate()
 		end
 		if AimLockGLOBAL.Settings.Mode == "HOLD" then
@@ -6847,11 +6850,9 @@ local function C_21b()
 
 	local HAVOC = getgenv().HAVOC
 
-	-- Function to find a setting by its name
 	local function findSettingByName(name, table)
 		for key, v in pairs(table) do
 			if typeof(v) == "table" then
-				-- Recursively search in sub-tables
 				local result = findSettingByName(name, v)
 				if result ~= nil then
 					return result
@@ -6863,12 +6864,9 @@ local function C_21b()
 		return nil
 	end
 
-	-- Function to find the KeyBind under the "Settings" sub-table
 	local function findKeyBindValue(buttonName, table)
 		for key, setting in pairs(table) do
-			-- If there's a "Settings" sub-table, check if it contains "KeyBind"
 			if setting.Settings and setting.Settings.KeyBind then
-				-- Check if the current button name matches a setting name
 				if key:upper() == buttonName:upper() then
 					return setting.Settings.KeyBind
 				end
@@ -6879,19 +6877,14 @@ local function C_21b()
 
 	for _, button in ipairs(script.Parent:GetDescendants()) do
 		if button:IsA("Frame") and button.Name ~= "Target" then
-			-- Find the setting for the current button
 			local settingValue = findSettingByName(button.Name:upper(), HAVOC)
-
-			-- Check for the KeyBind and update the KeyBind label
 			if button:FindFirstChild("KeyBind") then
 				local keyBindValue = findKeyBindValue(button.Name, HAVOC)
 				if keyBindValue and typeof(keyBindValue) == "EnumItem" then
-					print("Setting KeyBind for " .. button.Name .. " to " .. keyBindValue.Name)
 					button.KeyBind.Text = keyBindValue.Name
 				end
 			end
 
-			-- Update color if the setting is a boolean
 			if settingValue ~= nil then
 				local targetColor = (typeof(settingValue) == "boolean" and settingValue) and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(134, 0, 0)
 				local tween = TweenService:Create(button.Toggle, TweenInfoON, { BackgroundColor3 = targetColor })
