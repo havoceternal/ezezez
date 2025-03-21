@@ -6259,7 +6259,7 @@ local function C_174()
 			OrbitEnabled = false
 		end
 
-		if OrbitEnabled and not isBusy and targetPlayer then
+		if OrbitEnabled and not isBusy then
 			local gun = GetTool()
 			if gun then
 				getTargetCFrame()
