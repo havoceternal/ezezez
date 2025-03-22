@@ -6313,9 +6313,9 @@ local function C_173()
 						shootGun()
 					end
 
-					if InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value then
+					if targetPlayer and targetPlayer.Character and InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value then
 						isBusy = true
-						while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value do
+						while targetPlayer and targetPlayer.Character and InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value do
 							localPlayer.Character.Humanoid:UnequipTools()
 							getAmmo()
 						end
@@ -6325,9 +6325,9 @@ local function C_173()
 					end
 
 					if OrbitGLOBAL.Settings.Void and not isBusy then
-						if gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value then
+						if targetPlayer and targetPlayer.Character and gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value then
 							isBusy = true
-							while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value do
+							while targetPlayer and targetPlayer.Character and gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value do
 								wait()
 								void()
 							end
