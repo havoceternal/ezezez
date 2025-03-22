@@ -6165,8 +6165,6 @@ local function C_173()
 	local ESPS = script.Parent.Parent.Parent.Parent.Parent:WaitForChild("ESPSFolder")
 
 	local OrbitEnabled = false
-	local gettingAmmo = false
-	local reloadingAmmo = false
 	local isBusy = false
 	local minY = 1000000
 	local moveDistance = 1000
@@ -6226,7 +6224,7 @@ local function C_173()
 				end
 			end 
 		end
-		rootPart.CFrame = rifleModel.Head.CFrame * CFrame.new(0, -3, 0)
+		rootPart.CFrame = rifleModel.Head.CFrame * CFrame.new(0, 3, 0)
 		camera.CameraSubject = rifleModel.Head
 		camera.CFrame = CFrame.new(camera.CFrame.Position, rifleModel.Head.Position)
 		local screenPoint = camera:WorldToViewportPoint(rifleModel.Head.Position)
@@ -6237,7 +6235,7 @@ local function C_173()
 	end
 
 	local function getAmmo()
-		rootPart.CFrame = rifleAmmo.Head.CFrame * CFrame.new(0, -3, 0)
+		rootPart.CFrame = rifleAmmo.Head.CFrame * CFrame.new(0, 3, 0)
 		camera.CameraSubject = rifleAmmo.Head
 		camera.CFrame = CFrame.new(camera.CFrame.Position, rifleAmmo.Head.Position)
 		local screenPoint = camera:WorldToViewportPoint(rifleAmmo.Head.Position)
@@ -6319,59 +6317,59 @@ local function C_173()
 			if gun then
 				getTargetCFrame()
 				if targetPlayer and targetPlayer.Character then
-					if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and isBusy == false then
-						orbitAround()
-						lockCamera()
-						shootGun()
-					end
+					local targetBodyEffects = targetPlayer.Character:FindFirstChild("BodyEffects")
+					if targetBodyEffects then
+						rootPart.Anchored = false
+						if not targetBodyEffects['K.O'].Value and isBusy == false then
+							orbitAround()
+							lockCamera()
+							shootGun()
+						end
 
 					--[[if ESPS:FindFirstChild(targetPlayer.Name) then
 						ESPS[targetPlayer.Name].BOX.ImageColor3 = Color3.fromRGB(255, 0, 0)
 					end--]]
 
-					if InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 then
-						isBusy = true
-						while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not targetPlayer.Character:WaitForChild("BodyEffects")['Dead'].Value do
-							localPlayer.Character.Humanoid:UnequipTools()
-							gettingAmmo = true
-							getAmmo()
-						end
-						GetTool()
-						camera.CameraSubject = character
-						gettingAmmo = false
-						isBusy = false
-					end
-
-					if OrbitGLOBAL.Settings.Void and not isBusy then
-						if gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 then
-							if not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value then
-								isBusy = true
-								while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
-									reloadingAmmo = true
-									wait()
-									void()
-								end
-								reloadingAmmo = false
-								isBusy = false
+						if InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 then
+							isBusy = true
+							while InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not targetBodyEffects['K.O'].Value and not targetBodyEffects['Dead'].Value do
+								localPlayer.Character.Humanoid:UnequipTools()
+								getAmmo()
 							end
+							GetTool()
+							camera.CameraSubject = character
+							isBusy = false
 						end
-					end
-					if targetPlayer and targetPlayer.Character and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not gettingAmmo and not reloadingAmmo and not isBusy then
-						if OrbitGLOBAL.Settings.AutoStomp then
-							if targetPlayer.Character:WaitForChild("BodyEffects")['Dead'].Value then
-								if OrbitGLOBAL.Settings.Void then
+
+						if OrbitGLOBAL.Settings.Void and not isBusy then
+							if gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 then
+								if not targetBodyEffects['K.O'].Value then
 									isBusy = true
-									while targetPlayer and targetPlayer.Character and OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not gettingAmmo and not reloadingAmmo do
+									while gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value and not targetBodyEffects['K.O'].Value do
 										wait()
 										void()
 									end
 									isBusy = false
 								end
-							else
-								local upperTorsoPosition = targetPlayer.Character.UpperTorso.Position
-								local targetPosition = upperTorsoPosition + Vector3.new(0, 3, 0)
-								rootPart.CFrame = CFrame.new(targetPosition, targetPosition + Vector3.new(0, 0, -1))
-								ReplicatedStorage.MainEvent:FireServer("Stomp")
+							end
+						end
+						if targetPlayer and targetPlayer.Character and targetBodyEffects['K.O'].Value and not isBusy then
+							if OrbitGLOBAL.Settings.AutoStomp then
+								if targetBodyEffects['Dead'].Value then
+									if OrbitGLOBAL.Settings.Void then
+										isBusy = true
+										while targetPlayer and targetPlayer.Character and OrbitEnabled and targetBodyEffects['K.O'].Value and not localPlayer.Character:WaitForChild("BodyEffects")['K.O'].Value do
+											wait()
+											void()
+										end
+										isBusy = false
+									end
+								else
+									local upperTorsoPosition = targetPlayer.Character.UpperTorso.Position
+									local targetPosition = upperTorsoPosition + Vector3.new(0, 3, 0)
+									rootPart.CFrame = CFrame.new(targetPosition, targetPosition + Vector3.new(0, 0, -1))
+									ReplicatedStorage.MainEvent:FireServer("Stomp")
+								end
 							end
 						end
 					end
