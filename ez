@@ -6178,7 +6178,7 @@ local function purchase(model)
 	local screenPoint = camera:WorldToViewportPoint(model.Head.Position)
 	vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
 	vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
-	task.wait(0.05)
+	task.wait(0.15)
 	vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
 end
 
