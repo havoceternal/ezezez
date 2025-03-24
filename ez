@@ -25,6 +25,8 @@ local function LoadConfig()
 		RestoreKeyCodes(getgenv().HAVOC)
 	else
 		getgenv().HAVOC = {
+			GettingArmor = false,
+			GettingHealth = false,
 			AimLock = {
 				Enabled = false,
 				Target = "",
@@ -6696,8 +6698,6 @@ local function C_18a()
 	local HAVOC = getgenv().HAVOC
 	local TeleportGLOBAL = HAVOC.Teleport
 
-	local purchasing = false
-
 	local model
 	local originalPos
 
@@ -6728,20 +6728,21 @@ local function C_18a()
 
 
 	RunService.RenderStepped:Connect(function()
-		if purchasing then
+	model = workspace:FindFirstChild("[High-Medium Armor] - $2513", true)
+		if TeleportGLOBAL.AutoArmor and Character:FindFirstChild("BodyEffects") and Character.BodyEffects.Armor.Value < 130 then
+			HAVOC.GettingArmor = true
 			camera.CameraSubject = model.Head
 			camera.CFrame = CFrame.new(model.Head.Position + Vector3.new(0, 1, 0), model.Head.Position)
+		else
+			HAVOC.GettingArmor = false
 		end
-		if TeleportGLOBAL.AutoArmor and player.DataFolder.Currency.Value >= 2513 and Character:FindFirstChild("BodyEffects") and not Character.BodyEffects["K.O"].Value and not Character.BodyEffects["Dead"].Value and Character.BodyEffects.Armor.Value < 130 and not purchasing then
-			purchasing = true
+		if TeleportGLOBAL.AutoArmor and player.DataFolder.Currency.Value >= 2513 and Character:FindFirstChild("BodyEffects") and not Character.BodyEffects["K.O"].Value and not Character.BodyEffects["Dead"].Value and Character.BodyEffects.Armor.Value < 130 then
 			Humanoid:UnequipTools()
 			originalPos = HumanoidRootPart.CFrame
-			model = workspace:FindFirstChild("[High-Medium Armor] - $2513", true)
 			purchase(model)
 			wait(0.25)
 			HumanoidRootPart.CFrame = originalPos
 			camera.CameraSubject = Character
-			purchasing = false
 		end
 	end)
 end;
@@ -6825,7 +6826,6 @@ local function C_1a0()
 	local isBusy = false
 	local gettingAmmo = false
 	local reloadingAmmo = false
-	local gettingArmor = false
 	local minY = 1000000
 	local moveDistance = 1000
 
@@ -6870,40 +6870,40 @@ local function C_1a0()
 	end
 
 	local function GetTool()
-		local Tool
-		for _, v in pairs(localPlayer.Character:GetChildren()) do 
-			if string.find(v.Name,"Rifle") or string.find(v.Name, "LMG") or string.find(v.Name,"Silencer") or string.find(v.Name,"AUG") then
-				if v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo') then 
-					Tool = v
-					if not isBusy then
-						camera.CameraSubject = character
+		if not HAVOC.GettingArmor then
+			local Tool
+			for _, v in pairs(localPlayer.Character:GetChildren()) do 
+				if string.find(v.Name,"Rifle") or string.find(v.Name, "LMG") or string.find(v.Name,"Silencer") or string.find(v.Name,"AUG") then
+					if v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo') then 
+						Tool = v
+						if not isBusy then
+							camera.CameraSubject = character
+						end
+						return Tool
 					end
-					return Tool
 				end
 			end
-		end
-		for _,v in pairs(localPlayer.Backpack:GetChildren()) do
-			if string.find(v.Name,"Rifle") or string.find(v.Name, "LMG") or string.find(v.Name,"Silencer") or string.find(v.Name,"AUG") then
-				if v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo') then 
-					Tool = v 
-					if not gettingArmor then
+			for _,v in pairs(localPlayer.Backpack:GetChildren()) do
+				if string.find(v.Name,"Rifle") or string.find(v.Name, "LMG") or string.find(v.Name,"Silencer") or string.find(v.Name,"AUG") then
+					if v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo') then 
+						Tool = v 
 						localPlayer.Character.Humanoid:EquipTool(v)
+						return Tool
 					end
-					return Tool
-				end
-			end 
+				end 
+			end
+			rootPart.CFrame = rifleModel.Head.CFrame * CFrame.new(0, 3, 0)
+			camera.CameraSubject = rifleModel.Head
+			camera.CFrame = CFrame.new(rifleModel.Head.Position + Vector3.new(0, 1, 0), rifleModel.Head.Position)
+			local screenPoint = camera:WorldToViewportPoint(rifleModel.Head.Position)
+			vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
+			vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
+			vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
+			vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
+			task.wait(0.15)
+			vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
+			vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
 		end
-		rootPart.CFrame = rifleModel.Head.CFrame * CFrame.new(0, 3, 0)
-		camera.CameraSubject = rifleModel.Head
-		camera.CFrame = CFrame.new(rifleModel.Head.Position + Vector3.new(0, 1, 0), rifleModel.Head.Position)
-		local screenPoint = camera:WorldToViewportPoint(rifleModel.Head.Position)
-		vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
-		vim:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
-		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
-		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, true, game, 0)
-		task.wait(0.15)
-		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
-		vim:SendMouseButtonEvent(screenPoint.X, screenPoint.Y, 0, false, game, 0)
 	end
 
 	local function getAmmo()
@@ -6991,23 +6991,15 @@ local function C_1a0()
 				getTargetCFrame()
 				if targetPlayer and targetPlayer.Character then
 					rootPart.Anchored = false
-					if not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not isBusy and not gettingArmor then
+					if not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not isBusy and not HAVOC.GettingArmor then
 						orbitAround()
 						lockCamera()
 						shootGun()
 					end
 
-					if TeleportGLOBAL.AutoArmor and localPlayer and localPlayer.Character and localPlayer.Character:FindFirstChild("BodyEffects") and localPlayer.Character.BodyEffects.Armor.Value < 130 and localPlayer.DataFolder.Currency.Value >= 2513 then
-						gettingArmor = true
-					end
-
-					if localPlayer and localPlayer.Character and localPlayer.Character:FindFirstChild("BodyEffects") and localPlayer.Character.BodyEffects.Armor.Value >= 130 then
-						gettingArmor = false
-					end
-
-					if targetPlayer and targetPlayer.Character and InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not gettingArmor then
+					if targetPlayer and targetPlayer.Character and InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not HAVOC.GettingArmor then
 						isBusy = true
-						while targetPlayer and targetPlayer.Character and InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not gettingArmor do
+						while targetPlayer and targetPlayer.Character and InventoryFolder[gun.Name].Value == "0" and gun.Ammo.Value == 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not HAVOC.GettingArmor do
 							localPlayer.Character.Humanoid:UnequipTools()
 							camera.CameraSubject = rifleAmmo.Head
 							camera.CFrame = CFrame.new(rifleAmmo.Head.Position + Vector3.new(0, 1, 0), rifleAmmo.Head.Position)
@@ -7018,22 +7010,22 @@ local function C_1a0()
 						isBusy = false
 					end
 
-					if OrbitGLOBAL.Settings.Void and not isBusy and not gettingArmor then
-						if targetPlayer and targetPlayer.Character and gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not gettingArmor then
+					if OrbitGLOBAL.Settings.Void and not isBusy and not HAVOC.GettingArmor then
+						if targetPlayer and targetPlayer.Character and gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not HAVOC.GettingArmor then
 							isBusy = true
-							while targetPlayer and targetPlayer.Character and gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not gettingArmor do
+							while targetPlayer and targetPlayer.Character and gun.Ammo.Value == 0 and tonumber(InventoryFolder[gun.Name].Value) > 0 and OrbitEnabled and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not HAVOC.GettingArmor do
 								wait()
 								void()
 							end
 							isBusy = false
 						end
 					end
-					if targetPlayer and targetPlayer.Character and targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not isBusy and not gettingArmor then
+					if targetPlayer and targetPlayer.Character and targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not isBusy and not HAVOC.GettingArmor then
 						if OrbitGLOBAL.Settings.AutoStomp then
 							if targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('Dead').Value then
 								if OrbitGLOBAL.Settings.Void then
 									isBusy = true
-									while targetPlayer and targetPlayer.Character and OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not gettingArmor do
+									while targetPlayer and targetPlayer.Character and OrbitEnabled and targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not localPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not HAVOC.GettingArmor do
 										wait()
 										void()
 									end
@@ -7610,7 +7602,7 @@ local function C_248()
 			local settingTable = findSettingTable(frame.Name, getgenv().HAVOC)
 			local settingValue = findSettingByName(frame.Name:upper(), getgenv().HAVOC)
 
-			if frame:FindFirstChild("Toggle") and settingValue ~= nil then
+			if settingValue ~= nil then
 				local targetColor = (typeof(settingValue) == "boolean" and settingValue) and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(134, 0, 0)
 				local tween = TweenService:Create(frame.Toggle, TweenInfoON, { BackgroundColor3 = targetColor })
 				tween:Play()
