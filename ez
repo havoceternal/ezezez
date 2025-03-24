@@ -1,81 +1,109 @@
-getgenv().HAVOC = {
-	AimLock = {
-		Enabled = false,
-		Target = "",
-		Settings = {
-			Mode = "HOLD",
-			AimPart = "Head",
-			KeyBind = Enum.KeyCode.C,
-			CrewCheck = true,
-			FriendCheck = true,
-			AntiGroundShoot = true,
-			WallCheck = true,
-		}
-	},
-	Orbit = {
-		Enabled = false,
-		Target = "",
-		Settings  = {
-			AutoStomp = false,
-			Void = false,
-			AimPart = "Head",
-			KeyBind = Enum.KeyCode.V
-		}
-	},
-	LocalPlayer = {
-		CFrameWalk = {
-			Enabled = false,
-			Speed = 150,
-			Settings = {
-				KeyBind = Enum.KeyCode.F,
+local HttpService = game:GetService("HttpService")
+local configPath = "xdxd.json"
+
+local function RestoreKeyCodes(tbl)
+	for k, v in pairs(tbl) do
+		if type(v) == "string" then
+			if k~="AimPart" and k~="Mode" and k~="" and v~="" then
+				if Enum.KeyCode[v] then
+					local keyCode = Enum.KeyCode[v]
+					tbl[k] = keyCode
+				end
+			end
+		elseif typeof(v) == "table" then
+			RestoreKeyCodes(v)
+		end
+	end
+end
+
+local function LoadConfig()
+	if isfile(configPath) then
+		local jsonData = readfile(configPath)
+		getgenv().HAVOC = HttpService:JSONDecode(jsonData)
+		RestoreKeyCodes(getgenv().HAVOC)
+	else
+		getgenv().HAVOC = {
+			AimLock = {
+				Enabled = false,
+				Target = "",
+				Settings = {
+					KeyBind = Enum.KeyCode.C,
+					CrewCheck = true,
+					FriendCheck = true,
+					AntiGroundShoot = true,
+					WallCheck = true,
+					Mode = "HOLD",
+					AimPart = "Head",
+				}
 			},
-		},
-		Fly = {
-			Enabled = false,
-			Speed = 300,
-			Settings = {
-				KeyBind = Enum.KeyCode.H,
+			Orbit = {
+				Enabled = false,
+				Target = "",
+				Settings  = {
+					KeyBind = Enum.KeyCode.V,
+					AutoStomp = false,
+					Void = false,
+				}
 			},
-		},
-		CharacterSettings = {
-			InfStamina = false,
-			NoShootingRecoil = false,
-			AntiStomp = false,
-			NoSeats = false,
-		},
-	},
-	Player = {
-		ESP = {
-			Enabled = false,
-			AlwaysOnTop = true,
-			Box = false,
-		},
-		View = {
-			Enabled = false,
-			Target = "",
-		},
-		RageAim = {
-			KillAura = false,
-			Blacklist = {},
-			Whitelist = {},
-			WallBang = false,
-		},
-	},
-	AutoSettings = {
-		AutoReload = false,
-		AutoShoot = false,
-		AutoStomp = false,
-		AutoMask = false,
-	},
-	Teleport = {
-		AutoBuy = false,
-		AutoArmor = false,
-	},
-	GUISettings = { -- DONT TOUCH THIS UNLESS YOU KNOW WHAT YOUR DOING
-		ToggleOn = Color3.fromRGB(0, 0, 255),
-		ToggleOff = Color3.fromRGB(0, 0, 170)
-	}
-}
+			LocalPlayer = {
+				CFrameWalk = {
+					Enabled = false,
+					Speed = 150,
+					Settings = {
+						KeyBind = Enum.KeyCode.F,
+					},
+				},
+				Fly = {
+					Enabled = false,
+					Speed = 300,
+					Settings = {
+						KeyBind = Enum.KeyCode.H,
+					},
+				},
+				CharacterSettings = {
+					InfStamina = false,
+					NoShootingRecoil = false,
+					AntiStomp = false,
+					NoSeats = false,
+				},
+			},
+			Player = {
+				ESP = {
+					Enabled = false,
+					AlwaysOnTop = true,
+					Box = false,
+				},
+				View = {
+					Enabled = false,
+					Target = "",
+				},
+				RageAim = {
+					KillAura = false,
+					Blacklist = {},
+					Whitelist = {},
+					WallBang = false,
+				},
+			},
+			AutoSettings = {
+				AutoReload = false,
+				AutoShoot = false,
+				AutoStomp = false,
+				AutoMask = false,
+			},
+			Teleport = {
+				AutoBuy = false,
+				AutoArmor = false,
+			},
+			GUISettings = {
+				ToggleOn = Color3.fromRGB(0, 0, 255),
+				ToggleOff = Color3.fromRGB(0, 0, 170),
+				UIVisibility = Enum.KeyCode.LeftControl,
+			}
+		}
+	end
+end
+
+LoadConfig()
 
 --[=[
  d888b  db    db d888888b      .d888b.      db      db    db  .d8b.  
@@ -556,7 +584,7 @@ G2L["39"] = Instance.new("UIAspectRatioConstraint", G2L["e"]);
 G2L["39"]["AspectRatio"] = 1.61538;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings
 G2L["3a"] = Instance.new("Frame", G2L["e"]);
 G2L["3a"]["BorderSizePixel"] = 0;
 G2L["3a"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
@@ -564,16 +592,16 @@ G2L["3a"]["AutomaticSize"] = Enum.AutomaticSize.Y;
 G2L["3a"]["Size"] = UDim2.new(0.906, 0, 0.676, 0);
 G2L["3a"]["Position"] = UDim2.new(0.0566, 0, -0, 0);
 G2L["3a"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["3a"]["Name"] = [[Playersettings]];
+G2L["3a"]["Name"] = [[CharacterSettings]];
 G2L["3a"]["LayoutOrder"] = 3;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.UICorner
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.UICorner
 G2L["3b"] = Instance.new("UICorner", G2L["3a"]);
 G2L["3b"]["CornerRadius"] = UDim.new(0.05, 0);
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.Title
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.Title
 G2L["3c"] = Instance.new("TextLabel", G2L["3a"]);
 G2L["3c"]["TextWrapped"] = true;
 G2L["3c"]["BorderSizePixel"] = 0;
@@ -590,22 +618,22 @@ G2L["3c"]["Name"] = [[Title]];
 G2L["3c"]["Position"] = UDim2.new(-0, 0, -0, 0);
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.Title.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.Title.UIAspectRatioConstraint
 G2L["3d"] = Instance.new("UIAspectRatioConstraint", G2L["3c"]);
 G2L["3d"]["AspectRatio"] = 15.44224;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.UIListLayout
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.UIListLayout
 G2L["3e"] = Instance.new("UIListLayout", G2L["3a"]);
 G2L["3e"]["SortOrder"] = Enum.SortOrder.LayoutOrder;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.UIAspectRatioConstraint
 G2L["3f"] = Instance.new("UIAspectRatioConstraint", G2L["3a"]);
 G2L["3f"]["AspectRatio"] = 2.1659;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.INFSTAMINA
 G2L["40"] = Instance.new("Frame", G2L["3a"]);
 G2L["40"]["BorderSizePixel"] = 0;
 G2L["40"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
@@ -617,7 +645,7 @@ G2L["40"]["LayoutOrder"] = 1;
 G2L["40"]["BackgroundTransparency"] = 1;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA.Trigger
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.INFSTAMINA.Trigger
 G2L["41"] = Instance.new("TextButton", G2L["40"]);
 G2L["41"]["TextWrapped"] = true;
 G2L["41"]["BorderSizePixel"] = 0;
@@ -634,17 +662,17 @@ G2L["41"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["41"]["Text"] = [[INF STAMINA]];
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA.Trigger.UITextSizeConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.INFSTAMINA.Trigger.UITextSizeConstraint
 G2L["42"] = Instance.new("UITextSizeConstraint", G2L["41"]);
 G2L["42"]["MaxTextSize"] = 40;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA.Trigger.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.INFSTAMINA.Trigger.UIAspectRatioConstraint
 G2L["43"] = Instance.new("UIAspectRatioConstraint", G2L["41"]);
 G2L["43"]["AspectRatio"] = 13.9463;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA.Toggle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.INFSTAMINA.Toggle
 G2L["44"] = Instance.new("TextLabel", G2L["40"]);
 G2L["44"]["BorderSizePixel"] = 0;
 G2L["44"]["TextSize"] = 14;
@@ -658,39 +686,39 @@ G2L["44"]["Name"] = [[Toggle]];
 G2L["44"]["Position"] = UDim2.new(0.88346, 0, 0.15794, 0);
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA.Toggle.UICorner
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.INFSTAMINA.Toggle.UICorner
 G2L["45"] = Instance.new("UICorner", G2L["44"]);
 G2L["45"]["CornerRadius"] = UDim.new(0.2, 0);
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA.Toggle.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.INFSTAMINA.Toggle.UIAspectRatioConstraint
 G2L["46"] = Instance.new("UIAspectRatioConstraint", G2L["44"]);
 G2L["46"]["AspectRatio"] = 1.04435;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.INFSTAMINA.UIAspectRatioConstraint
 G2L["47"] = Instance.new("UIAspectRatioConstraint", G2L["40"]);
 G2L["47"]["AspectRatio"] = 13.9463;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA.Handle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.INFSTAMINA.Handle
 G2L["48"] = Instance.new("LocalScript", G2L["40"]);
 G2L["48"]["Name"] = [[Handle]];
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoShootingRecoil
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSHOOTINGRECOIL
 G2L["49"] = Instance.new("Frame", G2L["3a"]);
 G2L["49"]["BorderSizePixel"] = 0;
 G2L["49"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["49"]["Size"] = UDim2.new(1, 0, 0.1553, 0);
 G2L["49"]["Position"] = UDim2.new(0, 0, 0.14026, 0);
 G2L["49"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["49"]["Name"] = [[NoShootingRecoil]];
+G2L["49"]["Name"] = [[NOSHOOTINGRECOIL]];
 G2L["49"]["LayoutOrder"] = 2;
 G2L["49"]["BackgroundTransparency"] = 1;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoShootingRecoil.Trigger
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSHOOTINGRECOIL.Trigger
 G2L["4a"] = Instance.new("TextButton", G2L["49"]);
 G2L["4a"]["TextWrapped"] = true;
 G2L["4a"]["BorderSizePixel"] = 0;
@@ -707,17 +735,17 @@ G2L["4a"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["4a"]["Text"] = [[NO SHOOTING RECOIL]];
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoShootingRecoil.Trigger.UITextSizeConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSHOOTINGRECOIL.Trigger.UITextSizeConstraint
 G2L["4b"] = Instance.new("UITextSizeConstraint", G2L["4a"]);
 G2L["4b"]["MaxTextSize"] = 40;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoShootingRecoil.Trigger.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSHOOTINGRECOIL.Trigger.UIAspectRatioConstraint
 G2L["4c"] = Instance.new("UIAspectRatioConstraint", G2L["4a"]);
 G2L["4c"]["AspectRatio"] = 13.9463;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoShootingRecoil.Toggle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSHOOTINGRECOIL.Toggle
 G2L["4d"] = Instance.new("TextLabel", G2L["49"]);
 G2L["4d"]["BorderSizePixel"] = 0;
 G2L["4d"]["TextSize"] = 14;
@@ -731,39 +759,39 @@ G2L["4d"]["Name"] = [[Toggle]];
 G2L["4d"]["Position"] = UDim2.new(0.88346, 0, 0.15794, 0);
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoShootingRecoil.Toggle.UICorner
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSHOOTINGRECOIL.Toggle.UICorner
 G2L["4e"] = Instance.new("UICorner", G2L["4d"]);
 G2L["4e"]["CornerRadius"] = UDim.new(0.2, 0);
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoShootingRecoil.Toggle.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSHOOTINGRECOIL.Toggle.UIAspectRatioConstraint
 G2L["4f"] = Instance.new("UIAspectRatioConstraint", G2L["4d"]);
 G2L["4f"]["AspectRatio"] = 1.04435;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoShootingRecoil.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSHOOTINGRECOIL.UIAspectRatioConstraint
 G2L["50"] = Instance.new("UIAspectRatioConstraint", G2L["49"]);
 G2L["50"]["AspectRatio"] = 13.9463;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoShootingRecoil.Handle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSHOOTINGRECOIL.Handle
 G2L["51"] = Instance.new("LocalScript", G2L["49"]);
 G2L["51"]["Name"] = [[Handle]];
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.AntiStomp
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.ANTISTOMP
 G2L["52"] = Instance.new("Frame", G2L["3a"]);
 G2L["52"]["BorderSizePixel"] = 0;
 G2L["52"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["52"]["Size"] = UDim2.new(1, 0, 0.1553, 0);
 G2L["52"]["Position"] = UDim2.new(0, 0, 0.14026, 0);
 G2L["52"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["52"]["Name"] = [[AntiStomp]];
+G2L["52"]["Name"] = [[ANTISTOMP]];
 G2L["52"]["LayoutOrder"] = 3;
 G2L["52"]["BackgroundTransparency"] = 1;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.AntiStomp.Trigger
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.ANTISTOMP.Trigger
 G2L["53"] = Instance.new("TextButton", G2L["52"]);
 G2L["53"]["TextWrapped"] = true;
 G2L["53"]["BorderSizePixel"] = 0;
@@ -780,17 +808,17 @@ G2L["53"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["53"]["Text"] = [[ANTI STOMP]];
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.AntiStomp.Trigger.UITextSizeConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.ANTISTOMP.Trigger.UITextSizeConstraint
 G2L["54"] = Instance.new("UITextSizeConstraint", G2L["53"]);
 G2L["54"]["MaxTextSize"] = 40;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.AntiStomp.Trigger.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.ANTISTOMP.Trigger.UIAspectRatioConstraint
 G2L["55"] = Instance.new("UIAspectRatioConstraint", G2L["53"]);
 G2L["55"]["AspectRatio"] = 13.9463;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.AntiStomp.Toggle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.ANTISTOMP.Toggle
 G2L["56"] = Instance.new("TextLabel", G2L["52"]);
 G2L["56"]["BorderSizePixel"] = 0;
 G2L["56"]["TextSize"] = 14;
@@ -804,39 +832,39 @@ G2L["56"]["Name"] = [[Toggle]];
 G2L["56"]["Position"] = UDim2.new(0.88346, 0, 0.15794, 0);
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.AntiStomp.Toggle.UICorner
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.ANTISTOMP.Toggle.UICorner
 G2L["57"] = Instance.new("UICorner", G2L["56"]);
 G2L["57"]["CornerRadius"] = UDim.new(0.2, 0);
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.AntiStomp.Toggle.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.ANTISTOMP.Toggle.UIAspectRatioConstraint
 G2L["58"] = Instance.new("UIAspectRatioConstraint", G2L["56"]);
 G2L["58"]["AspectRatio"] = 1.04435;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.AntiStomp.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.ANTISTOMP.UIAspectRatioConstraint
 G2L["59"] = Instance.new("UIAspectRatioConstraint", G2L["52"]);
 G2L["59"]["AspectRatio"] = 13.9463;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.AntiStomp.Handle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.ANTISTOMP.Handle
 G2L["5a"] = Instance.new("LocalScript", G2L["52"]);
 G2L["5a"]["Name"] = [[Handle]];
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoSeats
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSEATS
 G2L["5b"] = Instance.new("Frame", G2L["3a"]);
 G2L["5b"]["BorderSizePixel"] = 0;
 G2L["5b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["5b"]["Size"] = UDim2.new(1, 0, 0.1553, 0);
 G2L["5b"]["Position"] = UDim2.new(0, 0, 0.14026, 0);
 G2L["5b"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["5b"]["Name"] = [[NoSeats]];
+G2L["5b"]["Name"] = [[NOSEATS]];
 G2L["5b"]["LayoutOrder"] = 3;
 G2L["5b"]["BackgroundTransparency"] = 1;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoSeats.Trigger
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSEATS.Trigger
 G2L["5c"] = Instance.new("TextButton", G2L["5b"]);
 G2L["5c"]["TextWrapped"] = true;
 G2L["5c"]["BorderSizePixel"] = 0;
@@ -853,17 +881,17 @@ G2L["5c"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["5c"]["Text"] = [[NO SEATS]];
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoSeats.Trigger.UITextSizeConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSEATS.Trigger.UITextSizeConstraint
 G2L["5d"] = Instance.new("UITextSizeConstraint", G2L["5c"]);
 G2L["5d"]["MaxTextSize"] = 40;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoSeats.Trigger.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSEATS.Trigger.UIAspectRatioConstraint
 G2L["5e"] = Instance.new("UIAspectRatioConstraint", G2L["5c"]);
 G2L["5e"]["AspectRatio"] = 13.9463;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoSeats.Toggle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSEATS.Toggle
 G2L["5f"] = Instance.new("TextLabel", G2L["5b"]);
 G2L["5f"]["BorderSizePixel"] = 0;
 G2L["5f"]["TextSize"] = 14;
@@ -877,27 +905,27 @@ G2L["5f"]["Name"] = [[Toggle]];
 G2L["5f"]["Position"] = UDim2.new(0.88346, 0, 0.15794, 0);
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoSeats.Toggle.UICorner
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSEATS.Toggle.UICorner
 G2L["60"] = Instance.new("UICorner", G2L["5f"]);
 G2L["60"]["CornerRadius"] = UDim.new(0.2, 0);
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoSeats.Toggle.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSEATS.Toggle.UIAspectRatioConstraint
 G2L["61"] = Instance.new("UIAspectRatioConstraint", G2L["5f"]);
 G2L["61"]["AspectRatio"] = 1.04435;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoSeats.UIAspectRatioConstraint
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSEATS.UIAspectRatioConstraint
 G2L["62"] = Instance.new("UIAspectRatioConstraint", G2L["5b"]);
 G2L["62"]["AspectRatio"] = 13.9463;
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoSeats.Handle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSEATS.Handle
 G2L["63"] = Instance.new("LocalScript", G2L["5b"]);
 G2L["63"]["Name"] = [[Handle]];
 
 
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.UIGradient
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.UIGradient
 G2L["64"] = Instance.new("UIGradient", G2L["3a"]);
 G2L["64"]["Rotation"] = 90;
 G2L["64"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(54, 0, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(77, 0, 0))};
@@ -1764,6 +1792,7 @@ G2L["ca"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.f
 
 -- StarterGui.havoc.MainFrame.ViewFrame.Settings
 G2L["cb"] = Instance.new("ScrollingFrame", G2L["d"]);
+G2L["cb"]["Visible"] = false;
 G2L["cb"]["Active"] = true;
 G2L["cb"]["ScrollingDirection"] = Enum.ScrollingDirection.Y;
 G2L["cb"]["BorderSizePixel"] = 0;
@@ -5155,7 +5184,6 @@ local function C_1d()
 
 	local activeKeys = {} -- Track currently pressed keys
 	local cframeMovementEnabled = false
-	local currentKeyBind = CFrame.Settings.KeyBind
 	local awaitingKeyBind = false
 
 	-- Function to update the character and humanoidRootPart reference
@@ -5216,8 +5244,8 @@ local function C_1d()
 	-- Handle key presses
 	userInputService.InputBegan:Connect(function(input, processed)
 		if awaitingKeyBind then
-			currentKeyBind = input.KeyCode
-			KeyBindBTN.Text = tostring(currentKeyBind):gsub("Enum.KeyCode.", "")
+			CFrame.Settings.KeyBind = input.KeyCode
+			KeyBindBTN.Text = tostring(CFrame.Settings.KeyBind):gsub("Enum.KeyCode.", "")
 			awaitingKeyBind = false
 			return
 		end
@@ -5232,7 +5260,7 @@ local function C_1d()
 			activeKeys.A = true
 		elseif input.KeyCode == Enum.KeyCode.D then
 			activeKeys.D = true
-		elseif input.KeyCode == currentKeyBind then
+		elseif input.KeyCode == CFrame.Settings.KeyBind then
 			toggleCFrameMovement(not cframeMovementEnabled)
 		end
 	end)
@@ -5308,7 +5336,6 @@ local function C_31()
 
 	local activeKeys = {}
 	local flyEnabled = false
-	local currentKeyBind = Fly.Settings.KeyBind
 	local awaitingKeyBind = false
 
 	local function updateCharacter()
@@ -5371,8 +5398,8 @@ local function C_31()
 
 	UserInputService.InputBegan:Connect(function(input, processed)
 		if awaitingKeyBind then
-			currentKeyBind = input.KeyCode
-			KeyBindBTN.Text = tostring(currentKeyBind):gsub("Enum.KeyCode.", "")
+			Fly.Settings.KeyBind = input.KeyCode
+			KeyBindBTN.Text = tostring(Fly.Settings.KeyBind):gsub("Enum.KeyCode.", "")
 			awaitingKeyBind = false
 			return
 		end
@@ -5385,7 +5412,7 @@ local function C_31()
 		if input.KeyCode == Enum.KeyCode.D then activeKeys.D = true end
 		if input.KeyCode == Enum.KeyCode.Space then activeKeys.Space = true end
 		if input.KeyCode == Enum.KeyCode.LeftShift then activeKeys.LeftShift = true end
-		if input.KeyCode == currentKeyBind then toggleFlying(not flyEnabled) end
+		if input.KeyCode == Fly.Settings.KeyBind then toggleFlying(not flyEnabled) end
 	end)
 
 	UserInputService.InputEnded:Connect(function(input)
@@ -5428,7 +5455,7 @@ local function C_38()
 	end)
 end;
 task.spawn(C_38);
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.INFSTAMINA.Handle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.INFSTAMINA.Handle
 local function C_48()
 	local script = G2L["48"];
 	local globaltable = getgenv().HAVOC.LocalPlayer.CharacterSettings
@@ -5466,7 +5493,7 @@ local function C_48()
 	end)
 end;
 task.spawn(C_48);
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoShootingRecoil.Handle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSHOOTINGRECOIL.Handle
 local function C_51()
 	local script = G2L["51"];
 	local globaltable = getgenv().HAVOC.LocalPlayer.CharacterSettings
@@ -5511,7 +5538,7 @@ local function C_51()
 	end)
 end;
 task.spawn(C_51);
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.AntiStomp.Handle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.ANTISTOMP.Handle
 local function C_5a()
 	local script = G2L["5a"];
 	local globaltable = getgenv().HAVOC.LocalPlayer.CharacterSettings
@@ -5549,7 +5576,7 @@ local function C_5a()
 	end)
 end;
 task.spawn(C_5a);
--- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.Playersettings.NoSeats.Handle
+-- StarterGui.havoc.MainFrame.ViewFrame.LocalPlayer.CharacterSettings.NOSEATS.Handle
 local function C_63()
 	local script = G2L["63"];
 	local globaltable = getgenv().HAVOC.LocalPlayer.CharacterSettings
@@ -6183,12 +6210,14 @@ task.spawn(C_c9);
 -- StarterGui.havoc.MainFrame.ViewFrame.Settings.MainSettings.UIVISIBILITY.Handle
 local function C_d6()
 	local script = G2L["d6"];
+	local HAVOC = getgenv().HAVOC
+	local GUISettingsGLOBAL = HAVOC.GUISettings
+
 	local userInputService = game:GetService("UserInputService")
 
-	local HAVOC = script.Parent.Parent.Parent.Parent.Parent
+	local HAVOCGui = script.Parent.Parent.Parent.Parent.Parent
 
 	local KeyBindBTN = script.Parent:WaitForChild("KeyBind")
-	local currentKeyBind = Enum.KeyCode.LeftControl
 
 	KeyBindBTN.MouseButton1Click:Connect(function()
 		KeyBindBTN.Text = "Press Any Key"
@@ -6198,14 +6227,14 @@ local function C_d6()
 	userInputService.InputBegan:Connect(function(input,processed)
 		if not processed then
 			if awaitingKeyBind then
-				currentKeyBind = input.KeyCode
-				KeyBindBTN.Text = tostring(currentKeyBind):gsub("Enum.KeyCode.", "")
+				GUISettingsGLOBAL.UIVisibility = input.KeyCode
+				KeyBindBTN.Text = tostring(GUISettingsGLOBAL.UIVisibility):gsub("Enum.KeyCode.", "")
 				awaitingKeyBind = false
 				return
 			end
 
-			if input.KeyCode == currentKeyBind then
-				HAVOC.Visible = not HAVOC.Visible
+			if input.KeyCode == GUISettingsGLOBAL.UIVisibility then
+				HAVOCGui.Visible = not HAVOCGui.Visible
 			end
 		end
 	end)
@@ -6214,10 +6243,8 @@ task.spawn(C_d6);
 -- StarterGui.havoc.MainFrame.ViewFrame.Settings.MainSettings.Handle
 local function C_e3()
 	local script = G2L["e3"];
-	local HAVOC = getgenv().HAVOC
-
 	local HttpService = game:GetService("HttpService")
-	local configPath = "HAVOCCONFIG.json"
+	local configPath = "xdxd.json"
 
 	local TweenService = game:GetService("TweenService")
 	local Players = game:GetService("Players")
@@ -6241,13 +6268,38 @@ local function C_e3()
 		})
 	end
 
-	local function SaveConfig(configTable)
-		local jsonData = HttpService:JSONEncode(configTable)
+	local function ConvertKeyCodes(tbl)
+		for k, v in pairs(tbl) do
+			if typeof(v) == "EnumItem" then
+				tbl[k] = v.Name
+			elseif typeof(v) == "table" then
+				ConvertKeyCodes(v)
+			end
+		end
+	end
+
+	local function SaveConfig()
+		if not getgenv().HAVOC then
+			sendNotification("Error", "No config to save!", 3)
+			return
+		end
+
+		local tempConfig = table.clone(getgenv().HAVOC)
+		ConvertKeyCodes(tempConfig)
+
+		local jsonData = HttpService:JSONEncode(tempConfig)
+
+		if isfile(configPath) and readfile(configPath) == jsonData then
+			sendNotification("Config", "No changes detected.", 3)
+			return
+		end
+
 		writefile(configPath, jsonData)
+		sendNotification("Config Saved", "Your settings have been saved!", 3)
 	end
 
 	saveconfigTrigger.MouseButton1Up:Connect(function()
-		SaveConfig(HAVOC)
+		SaveConfig()
 	end)
 
 	joinleaveBTN.MouseButton1Up:Connect(function()
@@ -7518,12 +7570,6 @@ local function C_248()
 	local script = G2L["248"];
 	local TweenService = game:GetService("TweenService")
 	local TweenInfoON = TweenInfo.new(0.1)
-	local TweenInfoOFF = TweenInfo.new(0.1)
-
-	local HttpService = game:GetService("HttpService")
-	local configPath = "HAVOCCONFIG.json"  -- File path
-
-	local HAVOC = getgenv().HAVOC
 
 	local function findSettingTable(name, parentTable)
 		local lowerName = name:lower()
@@ -7541,19 +7587,32 @@ local function C_248()
 		return nil
 	end
 
-	local function LoadConfig()
-		if isfile(configPath) then
-			local jsonData = readfile(configPath)
-			return HttpService:JSONDecode(jsonData)
+	local function findSettingByName(name, table)
+		for key, v in pairs(table) do
+			if typeof(v) == "table" then
+				local result = findSettingByName(name, v)
+				if result ~= nil then
+					return result
+				end
+			elseif key:upper() == name then
+				return v
+			end
 		end
-		return {}  -- Return empty table if no config found
+		return nil
 	end
 
-	LoadConfig()
+	wait(3)
 
 	for _, frame in ipairs(script.Parent:GetDescendants()) do
 		if frame:IsA("Frame") and frame.Name ~= "Target" then
-			local settingTable = findSettingTable(frame.Name, HAVOC)
+			local settingTable = findSettingTable(frame.Name, getgenv().HAVOC)
+			local settingValue = findSettingByName(frame.Name:upper(), getgenv().HAVOC)
+
+			if frame:FindFirstChild("Toggle") and settingValue ~= nil then
+				local targetColor = (typeof(settingValue) == "boolean" and settingValue) and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(134, 0, 0)
+				local tween = TweenService:Create(frame.Toggle, TweenInfoON, { BackgroundColor3 = targetColor })
+				tween:Play()
+			end
 
 			if settingTable then
 				if frame:FindFirstChild("KeyBind") then
@@ -7569,15 +7628,10 @@ local function C_248()
 						speedBox.Text = tostring(settingTable.Speed)
 					end
 				end
-
-				local targetColor = (typeof(settingTable) == "boolean" and settingTable) and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(134, 0, 0)
-				if frame:FindFirstChild("Toggle") then
-					local tween = TweenService:Create(frame.Toggle, TweenInfoON, { BackgroundColor3 = targetColor })
-					tween:Play()
-				end
 			end
 		end
 	end
+
 end;
 task.spawn(C_248);
 
