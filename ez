@@ -3,8 +3,10 @@ local configPath = "xdxd.json"
 
 local function RestoreKeyCodes(tbl)
 	for k, v in pairs(tbl) do
-		if type(v) == "string" then
-			if k~="AimPart" and k~="Mode" and k~="" and v~="" then
+		if k == "Target" then
+			tbl[k] = ""
+		elseif type(v) == "string" then
+			if k ~= "AimPart" and k ~= "Mode" and k ~= "" and v ~= "" then
 				if Enum.KeyCode[v] then
 					local keyCode = Enum.KeyCode[v]
 					tbl[k] = keyCode
