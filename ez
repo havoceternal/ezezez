@@ -1,5 +1,5 @@
 local HttpService = game:GetService("HttpService")
-local configPath = "xdxd.json"
+local configPath = "0000.json"
 
 local function RestoreKeyCodes(tbl)
 	for k, v in pairs(tbl) do
@@ -42,6 +42,7 @@ local function LoadConfig()
 			},
 			Orbit = {
 				Enabled = false,
+				Orbiting = false,
 				Target = "",
 				Settings  = {
 					KeyBind = Enum.KeyCode.V,
@@ -98,10 +99,12 @@ local function LoadConfig()
 				AutoBuy = false,
 				AutoArmor = false,
 			},
-			GUISettings = {
+			UIVisibility = {
 				ToggleOn = Color3.fromRGB(0, 0, 255),
 				ToggleOff = Color3.fromRGB(0, 0, 170),
-				UIVisibility = Enum.KeyCode.LeftControl,
+				Settings = {
+					KeyBind = Enum.KeyCode.LeftControl,
+				},
 			}
 		}
 	end
@@ -3276,7 +3279,7 @@ G2L["179"]["Name"] = [[Togglers]];
 G2L["17a"] = Instance.new("Frame", G2L["173"]);
 G2L["17a"]["BorderSizePixel"] = 0;
 G2L["17a"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["17a"]["Size"] = UDim2.new(0.99519, 0, 0.27504, 0);
+G2L["17a"]["Size"] = UDim2.new(1, 0, 0.27504, 0);
 G2L["17a"]["Position"] = UDim2.new(0, 0, 0.24, 0);
 G2L["17a"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["17a"]["Name"] = [[AUTOBUY]];
@@ -3319,7 +3322,7 @@ G2L["17e"]["BackgroundColor3"] = Color3.fromRGB(135, 0, 0);
 G2L["17e"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
 G2L["17e"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["17e"]["AnchorPoint"] = Vector2.new(0, 0.5);
-G2L["17e"]["Size"] = UDim2.new(0.05745, 0, 0.849, 0);
+G2L["17e"]["Size"] = UDim2.new(0.059, 0, 0.841, 0);
 G2L["17e"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["17e"]["Text"] = [[]];
 G2L["17e"]["Name"] = [[Toggle]];
@@ -3333,7 +3336,7 @@ G2L["17f"]["CornerRadius"] = UDim.new(0.2, 0);
 
 -- StarterGui.havoc.MainFrame.ViewFrame.Teleport.Config.AUTOBUY.Toggle.UIAspectRatioConstraint
 G2L["180"] = Instance.new("UIAspectRatioConstraint", G2L["17e"]);
-G2L["180"]["AspectRatio"] = 0.94366;
+G2L["180"]["AspectRatio"] = 0.9784;
 
 
 -- StarterGui.havoc.MainFrame.ViewFrame.Teleport.Config.AUTOBUY.UIAspectRatioConstraint
@@ -3345,7 +3348,7 @@ G2L["181"]["AspectRatio"] = 13.9463;
 G2L["182"] = Instance.new("Frame", G2L["173"]);
 G2L["182"]["BorderSizePixel"] = 0;
 G2L["182"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["182"]["Size"] = UDim2.new(0.99519, 0, 0.27504, 0);
+G2L["182"]["Size"] = UDim2.new(1, 0, 0.27504, 0);
 G2L["182"]["Position"] = UDim2.new(0, 0, 0.24, 0);
 G2L["182"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["182"]["Name"] = [[AUTOARMOR]];
@@ -3388,7 +3391,7 @@ G2L["186"]["BackgroundColor3"] = Color3.fromRGB(135, 0, 0);
 G2L["186"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
 G2L["186"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["186"]["AnchorPoint"] = Vector2.new(0, 0.5);
-G2L["186"]["Size"] = UDim2.new(0.05745, 0, 0.849, 0);
+G2L["186"]["Size"] = UDim2.new(0.059, 0, 0.841, 0);
 G2L["186"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["186"]["Text"] = [[]];
 G2L["186"]["Name"] = [[Toggle]];
@@ -3402,7 +3405,7 @@ G2L["187"]["CornerRadius"] = UDim.new(0.2, 0);
 
 -- StarterGui.havoc.MainFrame.ViewFrame.Teleport.Config.AUTOARMOR.Toggle.UIAspectRatioConstraint
 G2L["188"] = Instance.new("UIAspectRatioConstraint", G2L["186"]);
-G2L["188"]["AspectRatio"] = 0.94366;
+G2L["188"]["AspectRatio"] = 0.9784;
 
 
 -- StarterGui.havoc.MainFrame.ViewFrame.Teleport.Config.AUTOARMOR.UIAspectRatioConstraint
@@ -5571,7 +5574,7 @@ local function C_5a()
 
 	runservice.RenderStepped:Connect(function()
 		if globaltable.AntiStomp then
-			if Player.Character:WaitForChild("BodyEffects")['K.O'].Value == true then 
+			if Player and Player.Character and Player.Character:FindFirstChild("BodyEffects") and Player.Character.BodyEffects:FindFirstChild("K.O") and Player.Character:WaitForChild("BodyEffects")['K.O'].Value == true then 
 				if Player.Character:FindFirstChild("Head") then
 					Player.Character.Head:Destroy()
 				end
@@ -6215,7 +6218,7 @@ task.spawn(C_c9);
 local function C_d6()
 	local script = G2L["d6"];
 	local HAVOC = getgenv().HAVOC
-	local GUISettingsGLOBAL = HAVOC.GUISettings
+	local GUISettingsGLOBAL = HAVOC.UIVisibility
 
 	local userInputService = game:GetService("UserInputService")
 
@@ -6231,13 +6234,13 @@ local function C_d6()
 	userInputService.InputBegan:Connect(function(input,processed)
 		if not processed then
 			if awaitingKeyBind then
-				GUISettingsGLOBAL.UIVisibility = input.KeyCode
-				KeyBindBTN.Text = tostring(GUISettingsGLOBAL.UIVisibility):gsub("Enum.KeyCode.", "")
+				GUISettingsGLOBAL.Settings.KeyBind = input.KeyCode
+				KeyBindBTN.Text = tostring(GUISettingsGLOBAL.Settings.KeyBind):gsub("Enum.KeyCode.", "")
 				awaitingKeyBind = false
 				return
 			end
 
-			if input.KeyCode == GUISettingsGLOBAL.UIVisibility then
+			if input.KeyCode == GUISettingsGLOBAL.Settings.KeyBind then
 				HAVOCGui.Visible = not HAVOCGui.Visible
 			end
 		end
@@ -6248,12 +6251,15 @@ task.spawn(C_d6);
 local function C_e3()
 	local script = G2L["e3"];
 	local HttpService = game:GetService("HttpService")
-	local configPath = "xdxd.json"
+	local configPath = "0000.json"
 
 	local TweenService = game:GetService("TweenService")
 	local Players = game:GetService("Players")
 	local StarterGui = game:GetService("StarterGui")
 	local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+
+local originalHAVOC = getgenv().HAVOC
+
 
 	local player = game.Players.LocalPlayer
 
@@ -6283,24 +6289,26 @@ local function C_e3()
 	end
 
 	local function SaveConfig()
-		if not getgenv().HAVOC then
-			sendNotification("Error", "No config to save!", 3)
-			return
-		end
-
-		local tempConfig = table.clone(getgenv().HAVOC)
-		ConvertKeyCodes(tempConfig)
-
-		local jsonData = HttpService:JSONEncode(tempConfig)
-
-		if isfile(configPath) and readfile(configPath) == jsonData then
-			sendNotification("Config", "No changes detected.", 3)
-			return
-		end
-
-		writefile(configPath, jsonData)
-		sendNotification("Config Saved", "Your settings have been saved!", 3)
+	if not getgenv().HAVOC then
+		sendNotification("Error", "No config to save!", 3)
+		return
 	end
+
+	local tempConfig = table.clone(getgenv().HAVOC)
+	ConvertKeyCodes(tempConfig)
+
+	local jsonData = HttpService:JSONEncode(tempConfig)
+
+	if isfile(configPath) and readfile(configPath) == jsonData then
+		sendNotification("Config", "No changes detected.", 3)
+		return
+	end
+
+	writefile(configPath, jsonData)
+	sendNotification("Config Saved", "Your settings have been saved!", 3)
+
+	getgenv().HAVOC = originalHAVOC 
+end
 
 	saveconfigTrigger.MouseButton1Up:Connect(function()
 		SaveConfig()
@@ -6697,9 +6705,12 @@ local function C_18a()
 
 	local HAVOC = getgenv().HAVOC
 	local TeleportGLOBAL = HAVOC.Teleport
+	local OrbitGLOBAL = HAVOC.Orbit
 
 	local model
+	local purchasingArmor = false
 	local originalPos
+	local originalTool
 
 	local function updateCharacter()
 		Character = player.Character or player.CharacterAdded:Wait()
@@ -6726,23 +6737,33 @@ local function C_18a()
 		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
 	end
 
-
 	RunService.RenderStepped:Connect(function()
-	model = workspace:FindFirstChild("[High-Medium Armor] - $2513", true)
-		if TeleportGLOBAL.AutoArmor and Character:FindFirstChild("BodyEffects") and Character.BodyEffects.Armor.Value < 130 then
+		model = workspace:FindFirstChild("[High-Medium Armor] - $2513", true)
+			if TeleportGLOBAL.AutoArmor and Character:FindFirstChild("BodyEffects") and not Character.BodyEffects["K.O"].Value and not Character.BodyEffects["Dead"].Value and Character.BodyEffects.Armor.Value < 130 then
+			player.Character.Humanoid:UnequipTools()
 			HAVOC.GettingArmor = true
 			camera.CameraSubject = model.Head
 			camera.CFrame = CFrame.new(model.Head.Position + Vector3.new(0, 1, 0), model.Head.Position)
 		else
 			HAVOC.GettingArmor = false
 		end
-		if TeleportGLOBAL.AutoArmor and player.DataFolder.Currency.Value >= 2513 and Character:FindFirstChild("BodyEffects") and not Character.BodyEffects["K.O"].Value and not Character.BodyEffects["Dead"].Value and Character.BodyEffects.Armor.Value < 130 then
-			Humanoid:UnequipTools()
+		if TeleportGLOBAL.AutoArmor and player.DataFolder.Currency.Value >= 2513 and Character:FindFirstChild("BodyEffects") and not Character.BodyEffects["K.O"].Value and not Character.BodyEffects["Dead"].Value and Character.BodyEffects.Armor.Value < 130 and not purchasingArmor then
+			purchasingArmor = true
+			if Character:FindFirstChildOfClass("Tool") and not OrbitGLOBAL.Orbiting then
+				originalTool = Character:FindFirstChildOfClass("Tool")
+			else
+				originalTool = nil
+			end
 			originalPos = HumanoidRootPart.CFrame
 			purchase(model)
 			wait(0.25)
 			HumanoidRootPart.CFrame = originalPos
 			camera.CameraSubject = Character
+			if originalTool~=nil then
+				print('equipping tools auto armor')
+				--Humanoid:EquipTool(originalTool)
+			end
+			purchasingArmor = false
 		end
 	end)
 end;
@@ -6887,7 +6908,10 @@ local function C_1a0()
 				if string.find(v.Name,"Rifle") or string.find(v.Name, "LMG") or string.find(v.Name,"Silencer") or string.find(v.Name,"AUG") then
 					if v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo') then 
 						Tool = v 
-						localPlayer.Character.Humanoid:EquipTool(v)
+						if not HAVOC.GettingArmor then
+							print('equipping tools orbit')
+							localPlayer.Character.Humanoid:EquipTool(v)
+						end
 						return Tool
 					end
 				end 
@@ -6975,6 +6999,7 @@ local function C_1a0()
 				else
 					camera.CameraSubject = character
 					OrbitEnabled = false
+					OrbitGLOBAL.Orbiting = false
 				end
 			end
 		end
@@ -6991,6 +7016,7 @@ local function C_1a0()
 				getTargetCFrame()
 				if targetPlayer and targetPlayer.Character then
 					rootPart.Anchored = false
+					OrbitGLOBAL.Orbiting = true
 					if not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not isBusy and not HAVOC.GettingArmor then
 						orbitAround()
 						lockCamera()
@@ -7599,23 +7625,23 @@ local function C_248()
 
 	for _, frame in ipairs(script.Parent:GetDescendants()) do
 		if frame:IsA("Frame") and frame.Name ~= "Target" then
-			local settingTable = findSettingTable(frame.Name, getgenv().HAVOC)
-			local settingValue = findSettingByName(frame.Name:upper(), getgenv().HAVOC)
-
-			if settingValue ~= nil then
-				local targetColor = (typeof(settingValue) == "boolean" and settingValue) and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(134, 0, 0)
-				local tween = TweenService:Create(frame.Toggle, TweenInfoON, { BackgroundColor3 = targetColor })
-				tween:Play()
-			end
-
-			if settingTable then
-				if frame:FindFirstChild("KeyBind") then
+			if frame:FindFirstChild("Toggle") and not frame:FindFirstChild("KeyBind") then
+				local settingValue = findSettingByName(frame.Name:upper(), getgenv().HAVOC)
+				if settingValue ~= nil then
+					local targetColor = (typeof(settingValue) == "boolean" and settingValue) and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(134, 0, 0)
+					local tween = TweenService:Create(frame.Toggle, TweenInfoON, { BackgroundColor3 = targetColor })
+					tween:Play()
+				end
+			elseif frame:FindFirstChild("KeyBind") then
+				local settingTable = findSettingTable(frame.Name, getgenv().HAVOC)
+				if settingTable then
 					local keyBind = settingTable.Settings and settingTable.Settings.KeyBind
 					if keyBind and typeof(keyBind) == "EnumItem" then
 						frame.KeyBind.Text = keyBind.Name
 					end
 				end
-
+			elseif frame:FindFirstChild("SPEED") then
+				local settingTable = findSettingTable(frame.Name, getgenv().HAVOC)
 				local speedBox = frame:FindFirstChild("SPEED")
 				if speedBox and speedBox:IsA("TextBox") then
 					if settingTable.Speed and typeof(settingTable.Speed) == "number" then
