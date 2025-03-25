@@ -6217,7 +6217,7 @@ local function C_b3()
 						and target.Character:FindFirstChild("BodyEffects") 
 						and not target.Character.BodyEffects["K.O"].Value 
 						and checkCrew(target) 
-						and not checkFriend(target.UserId)
+						and not checkFriend(target)
 						and shouldKill(target) then
 
 						shortestDistance = distance
