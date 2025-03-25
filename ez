@@ -7067,7 +7067,7 @@ local function C_1a1()
 		if not HAVOC.GettingArmor then
 			local Tool
 			for _, v in pairs(localPlayer.Character:GetChildren()) do 
-				if string.find(v.Name:lower(),OrbitGLOBAL.Settings.GunMode:lower())then
+				if string.find(v.Name:upper(),OrbitGLOBAL.Settings.GunMode)then
 					if v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo') then 
 						Tool = v
 						if not isBusy then
@@ -7183,19 +7183,19 @@ local function C_1a1()
 		end
 
 		if OrbitEnabled and not isBusy then
-			local gun = GetTool()
-			if gun then
-				getTargetCFrame()
-				if targetPlayer and targetPlayer.Character then
-					rootPart.Anchored = false
-					OrbitGLOBAL.Orbiting = true
-					if OrbitGLOBAL.Settings.GunMode == "RIFLE" then
+		if OrbitGLOBAL.Settings.GunMode == "RIFLE" then
 						gunModel = rifleModel
 						gunAmmo = rifleAmmo
 					elseif OrbitGLOBAL.Settings.GunMode == "AUG" then
 						gunModel = augModel
 						gunAmmo = augAmmo
 					end
+			local gun = GetTool()
+			if gun then
+				getTargetCFrame()
+				if targetPlayer and targetPlayer.Character then
+					rootPart.Anchored = false
+					OrbitGLOBAL.Orbiting = true
 					if not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not isBusy and not HAVOC.GettingArmor then
 						orbitAround()
 						lockCamera()
