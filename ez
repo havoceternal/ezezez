@@ -1,5 +1,5 @@
 local HttpService = game:GetService("HttpService")
-local configPath = "0000.json"
+local configPath = "9999.json"
 
 local function RestoreKeyCodes(tbl)
 	for k, v in pairs(tbl) do
@@ -951,7 +951,6 @@ G2L["66"]["Active"] = true;
 G2L["66"]["ScrollingDirection"] = Enum.ScrollingDirection.Y;
 G2L["66"]["BorderSizePixel"] = 0;
 G2L["66"]["CanvasSize"] = UDim2.new(0, 0, 3, 0);
-G2L["66"]["CanvasPosition"] = Vector2.new(0, 140);
 G2L["66"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["66"]["Name"] = [[Player]];
 G2L["66"]["AutomaticCanvasSize"] = Enum.AutomaticSize.Y;
@@ -6483,14 +6482,12 @@ task.spawn(C_dd);
 local function C_ea()
 	local script = G2L["ea"];
 	local HttpService = game:GetService("HttpService")
-	local configPath = "0000.json"
+	local configPath = "9999.json"
 
 	local TweenService = game:GetService("TweenService")
 	local Players = game:GetService("Players")
 	local StarterGui = game:GetService("StarterGui")
 	local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-
-	local originalHAVOC = getgenv().HAVOC
 
 	local player = game.Players.LocalPlayer
 
@@ -6937,7 +6934,7 @@ local function C_191()
 	local TeleportGLOBAL = HAVOC.Teleport
 	local OrbitGLOBAL = HAVOC.Orbit
 
-	local model
+	local armor = workspace:FindFirstChild("[High-Medium Armor] - $2513", true)
 	local purchasingArmor = false
 	local originalPos
 	local originalTool
@@ -6967,13 +6964,12 @@ local function C_191()
 		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
 	end
 
-	RunService.RenderStepped:Connect(function()
-		model = workspace:FindFirstChild("[High-Medium Armor] - $2513", true)
+	RunService.RenderStepped:Connect(function() 
 		if TeleportGLOBAL.AutoArmor and Character:FindFirstChild("BodyEffects") and not Character.BodyEffects["K.O"].Value and not Character.BodyEffects["Dead"].Value and Character.BodyEffects.Armor.Value < 130 then
 			player.Character.Humanoid:UnequipTools()
 			HAVOC.GettingArmor = true
-			camera.CameraSubject = model.Head
-			camera.CFrame = CFrame.new(model.Head.Position + Vector3.new(0, 1, 0), model.Head.Position)
+			camera.CameraSubject = armor.Head
+			camera.CFrame = CFrame.new(armor.Head.Position + Vector3.new(0, 1, 0), armor.Head.Position)
 		else
 			HAVOC.GettingArmor = false
 		end
@@ -6985,12 +6981,11 @@ local function C_191()
 				originalTool = nil
 			end
 			originalPos = HumanoidRootPart.CFrame
-			purchase(model)
+			purchase(armor)
 			wait(0.25)
 			HumanoidRootPart.CFrame = originalPos
 			camera.CameraSubject = Character
 			if originalTool~=nil then
-				print('equipping tools auto armor')
 				--Humanoid:EquipTool(originalTool)
 			end
 			purchasingArmor = false
@@ -7067,7 +7062,7 @@ local function C_1a1()
 		if not HAVOC.GettingArmor then
 			local Tool
 			for _, v in pairs(localPlayer.Character:GetChildren()) do 
-				if string.find(v.Name:upper(),OrbitGLOBAL.Settings.GunMode)then
+				if string.find(v.Name:lower(),OrbitGLOBAL.Settings.GunMode:lower())then
 					if v:FindFirstChild('Ammo') and v:FindFirstChild('MaxAmmo') then 
 						Tool = v
 						if not isBusy then
@@ -7181,21 +7176,21 @@ local function C_1a1()
 		if not OrbitGLOBAL.Enabled and OrbitEnabled then
 			OrbitEnabled = false
 		end
-
-		if OrbitEnabled and not isBusy then
-		if OrbitGLOBAL.Settings.GunMode == "RIFLE" then
+if OrbitGLOBAL.Settings.GunMode == "RIFLE" then
 						gunModel = rifleModel
 						gunAmmo = rifleAmmo
 					elseif OrbitGLOBAL.Settings.GunMode == "AUG" then
 						gunModel = augModel
 						gunAmmo = augAmmo
 					end
+		if OrbitEnabled and not isBusy then
 			local gun = GetTool()
 			if gun then
 				getTargetCFrame()
 				if targetPlayer and targetPlayer.Character then
 					rootPart.Anchored = false
 					OrbitGLOBAL.Orbiting = true
+					
 					if not targetPlayer.Character:WaitForChild("BodyEffects"):WaitForChild('K.O').Value and not isBusy and not HAVOC.GettingArmor then
 						orbitAround()
 						lockCamera()
